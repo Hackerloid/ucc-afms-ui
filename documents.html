@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Documents</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button type="button" class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html" class="active"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="offline.html"><i>📶</i> <span>Offline Mode</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>Document Registry</h1>
+                <p class="subtitle-text">Monitor and manage all academic records and administrative files</p>
+            </div>
+            <div class="header-right action-bar">
+                <button type="button" class="btn-modern btn-modern-primary" onclick="openRegisterModal()">+ Register New Document</button>
+                <div class="notifications" style="cursor: pointer; font-size: 1.2rem;">🔔</div>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <div class="stats-container animate-fade delay-1">
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Total Files</div>
+                <div class="stat-value" id="totalDocs">0</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">Across all categories</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Pending Approval</div>
+                <div class="stat-value" id="pendingApprovals">0</div>
+                <div class="stat-growth" style="color: var(--warning); font-size: 0.8rem;">Review required</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">System Storage</div>
+                <div class="stat-value">65%</div>
+                <div class="stat-growth" style="color: var(--info); font-size: 0.8rem;">65GB of 100GB used</div>
+            </div>
+        </div>
+
+        <!-- Documents Table Section -->
+        <div class="glass-panel animate-fade delay-2" style="padding: 30px; min-height: 400px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <div style="display: flex; gap: 15px;">
+                    <input type="text" id="searchInput" placeholder="Search by title or reference..." class="login-input-modern" style="margin-top: 0; width: 350px;" onkeyup="filterDocs()">
+                    <select id="statusFilter" class="login-input-modern" style="margin-top: 0; width: 150px;" onchange="filterDocs()">
+                        <option value="">All Status</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                    <select id="deptFilter" class="login-input-modern" style="margin-top: 0; width: 200px;" onchange="filterDocs()">
+                        <option value="">All Departments</option>
+                        <option value="Finance">Finance</option>
+                        <option value="HR">HR</option>
+                        <option value="Registry">Registry</option>
+                        <option value="ICT">ICT</option>
+                        <option value="Academic Affairs">Academic Affairs</option>
+                        <option value="Directorate of Finance">Directorate of Finance</option>
+                        <option value="Directorate of Human Resource">Directorate of Human Resource</option>
+                        <option value="Directorate of ICT Services">Directorate of ICT Services</option>
+                        <option value="Department of Computer Science & Information Technology">Department of Computer Science & IT</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-modern" style="background: #edf2f7; color: var(--primary);" onclick="openUploadModal()">Bulk Upload</button>
+                </div>
+            </div>
+
+            <div class="table-container-modern">
+                <table class="modern-table" id="docsTable">
+                    <thead>
+                        <tr>
+                            <th>Reference</th>
+                            <th>Subject & Description</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Dept</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="docsTableBody">
+                        <!-- Documents will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Register Document Modal (Aligned with FR-303) -->
+    <div id="registerModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="glass-panel animate-fade" style="background: white; width: 100%; max-width: 700px; padding: 40px; border-radius: 20px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
+                <h2>Register Document</h2>
+                <span style="cursor: pointer; font-size: 1.5rem;" onclick="closeModal('registerModal')">&times;</span>
+            </div>
+            <form id="registerForm" onsubmit="registerDoc(event)">
+                <div class="login-form-group">
+                    <label>Subject / Title</label>
+                    <input type="text" id="docTitle" class="login-input-modern" placeholder="e.g. Budget 2025 Proposal" required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="login-form-group">
+                        <label>Document Type</label>
+                        <select id="docType" class="login-input-modern">
+                            <option value="Incoming Letter">Incoming Letter</option>
+                            <option value="Outgoing Letter">Outgoing Letter</option>
+                            <option value="Internal Memo">Internal Memo</option>
+                            <option value="Circular">Circular</option>
+                            <option value="Report">Report</option>
+                        </select>
+                        <p style="font-size: 0.75rem; color: var(--primary); margin-top: 5px; cursor: pointer;" onclick="window.location.href='correspondence.html'">
+                            💡 Need to send an internal letter? <b>Go to Correspondence</b>
+                        </p>
+                    </div>
+                    <div class="login-form-group">
+                        <label>Priority</label>
+                        <select id="docPriority" class="login-input-modern">
+                            <option value="Normal">Normal</option>
+                            <option value="Urgent">Urgent</option>
+                            <option value="Confidential">Confidential</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="login-form-group">
+                        <label>Sender (Internal/External)</label>
+                        <input type="text" id="docSender" class="login-input-modern" placeholder="Sender Name" required>
+                    </div>
+                    <div class="login-form-group">
+                        <label>Target Department</label>
+                        <select id="docDept" class="login-input-modern" required>
+                            <option value="Finance">Finance</option>
+                            <option value="HR">HR / Directorate of HR</option>
+                            <option value="Registry">Registry / Academic Affairs</option>
+                            <option value="ICT">ICT Services</option>
+                            <option value="Department of Computer Science & Information Technology">Department of Computer Science & IT</option>
+                            <option value="Department of Physics">Department of Physics</option>
+                            <option value="Department of Chemistry">Department of Chemistry</option>
+                            <option value="School of Business">School of Business</option>
+                            <option value="Directorate of Finance">Directorate of Finance</option>
+                            <option value="Vice-Chancellor's Office">Vice-Chancellor's Office</option>
+                            <option value="Other">Other University Unit</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="login-form-group">
+                        <label>Date of Letter / Received</label>
+                        <input type="date" id="docDate" class="login-input-modern" required>
+                    </div>
+                    <div class="login-form-group">
+                        <label>Department</label>
+                        <select id="docDept" class="login-input-modern">
+                            <option value="Finance">Finance</option>
+                            <option value="HR">HR</option>
+                            <option value="Registry">Registry</option>
+                            <option value="ICT">ICT</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="login-form-group">
+                    <label>Tags / Keywords (Comma separated)</label>
+                    <input type="text" id="docTags" class="login-input-modern" placeholder="budget, 2025, finance">
+                </div>
+
+                <div class="login-form-group">
+                    <label>Description / Change Summary</label>
+                    <textarea id="docDesc" class="login-input-modern" style="min-height: 80px; resize: vertical;"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-modern btn-modern-primary" style="width: 100%; margin-top: 10px;">Register and Submit for Workflow</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Mock Documents Persistence Aligned with FR-303
+        let documents = [
+            { ref: 'REF-2024-001', title: 'Annual Financial Audit', type: 'Report', department: 'Finance', status: 'Approved', priority: 'Urgent', desc: 'Financial audit for the academic year 2023/2024.' },
+            { ref: 'REF-2024-002', title: 'Senate Meeting Minutes', type: 'Minutes', department: 'Registry', status: 'Pending', priority: 'Normal', desc: 'Minutes from the 102nd Senate Meeting.' },
+            { ref: 'REF-2024-003', title: 'IT Infrastructure Expansion', type: 'Proposal', department: 'ICT', status: 'In Review', priority: 'Confidential', desc: 'Proposal for campus-wide fiber optic network expansion.' },
+            { ref: 'REF-2024-004', title: 'HR Policy Revisions', type: 'Report', department: 'HR', status: 'Approved', priority: 'Normal', desc: 'Updated staff welfare and sabbatical leave policies.' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebarUser();
+            renderDocs();
+            updateStats();
+        });
+
+        function loadSidebarUser() {
+            const userData = sessionStorage.getItem('currentUser');
+            if (userData) {
+                const currentUser = JSON.parse(userData);
+                document.getElementById('userNameSidebar').textContent = currentUser.name;
+                document.getElementById('userRoleSidebar').textContent = currentUser.role;
+            }
+        }
+
+        function renderDocs() {
+            const tbody = document.getElementById('docsTableBody');
+            tbody.innerHTML = '';
+            
+            documents.forEach((doc, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-family: monospace; font-weight: 600;">${doc.ref}</td>
+                    <td>
+                        <div style="font-weight:600;">${doc.title}</div>
+                        <div style="font-size:0.8rem; color:#666; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${doc.desc}</div>
+                    </td>
+                    <td>${doc.type}</td>
+                    <td><span class="badge-modern ${getPriorityBadgeClass(doc.priority)}">${doc.priority}</span></td>
+                    <td>${doc.department}</td>
+                    <td><span class="badge-modern ${getStatusBadgeClass(doc.status)}">${doc.status}</span></td>
+                    <td>
+                        <button type="button" onclick="viewDoc(${index})" class="btn-modern" style="padding: 5px 10px; background: transparent; color: var(--primary); font-size: 0.8rem;">View</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getPriorityBadgeClass(prio) {
+            switch(prio) {
+                case 'Urgent': return 'badge-danger';
+                case 'Confidential': return 'badge-warning';
+                default: return 'badge-info';
+            }
+        }
+
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'Approved': return 'badge-success';
+                case 'Pending': return 'badge-warning';
+                case 'Rejected': return 'badge-danger';
+                default: return 'badge-info';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalDocs').textContent = documents.length;
+            document.getElementById('pendingApprovals').textContent = documents.filter(d => d.status === 'Pending').length;
+        }
+
+        function filterDocs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const deptFilter = document.getElementById('deptFilter').value;
+            
+            const filtered = documents.filter(doc => {
+                const matchesSearch = doc.title.toLowerCase().includes(searchTerm) || doc.ref.toLowerCase().includes(searchTerm);
+                const matchesStatus = statusFilter === '' || doc.status === statusFilter;
+                const matchesDept = deptFilter === '' || doc.department === deptFilter;
+                return matchesSearch && matchesStatus && matchesDept;
+            });
+            
+            renderFilteredDocs(filtered);
+        }
+
+        function renderFilteredDocs(filtered) {
+            const tbody = document.getElementById('docsTableBody');
+            tbody.innerHTML = '';
+            filtered.forEach((doc, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-family: monospace; font-weight: 600;">${doc.ref}</td>
+                    <td>
+                        <div style="font-weight:600;">${doc.title}</div>
+                        <div style="font-size:0.8rem; color:#666; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${doc.desc}</div>
+                    </td>
+                    <td>${doc.type}</td>
+                    <td><span class="badge-modern ${getPriorityBadgeClass(doc.priority)}">${doc.priority}</span></td>
+                    <td>${doc.department}</td>
+                    <td><span class="badge-modern ${getStatusBadgeClass(doc.status)}">${doc.status}</span></td>
+                    <td>
+                        <button type="button" class="btn-modern" style="padding: 5px 10px; background: transparent; color: var(--primary); font-size: 0.8rem;" onclick="viewDoc(${index})">View</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openRegisterModal() {
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function registerDoc(e) {
+            e.preventDefault();
+            const newDoc = {
+                ref: `REF-2024-00${documents.length + 1}`,
+                title: document.getElementById('docTitle').value,
+                type: document.getElementById('docType').value,
+                priority: document.getElementById('docPriority').value,
+                department: document.getElementById('docDept').value,
+                sender: document.getElementById('docSender').value,
+                recipient: document.getElementById('docRecipient').value,
+                date: document.getElementById('docDate').value,
+                tags: document.getElementById('docTags').value,
+                status: 'Pending',
+                desc: document.getElementById('docDesc').value || 'No description provided.'
+            };
+            documents.unshift(newDoc);
+            renderDocs();
+            updateStats();
+            closeModal('registerModal');
+            e.target.reset();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar-modern').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

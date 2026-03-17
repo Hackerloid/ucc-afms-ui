@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Workflows</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button type="button" class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html" class="active"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="offline.html"><i>📶</i> <span>Offline Mode</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>Active Workflows</h1>
+                <p class="subtitle-text">Track and manage document approval cycles and administrative processes</p>
+            </div>
+            <div class="header-right action-bar">
+                <button type="button" class="btn-modern btn-modern-primary" onclick="openCreateWorkflowModal()">+ New Workflow</button>
+                <div class="notifications" style="cursor: pointer; font-size: 1.2rem;">🔔</div>
+            </div>
+        </header>
+
+        <!-- Stats Section Icons -->
+        <div class="stats-container animate-fade delay-1">
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Running</div>
+                <div class="stat-value" id="runningCount">0</div>
+                <div class="stat-growth" style="color: var(--info); font-size: 0.8rem;">Active processes</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Bottlenecks</div>
+                <div class="stat-value" id="bottleneckCount">0</div>
+                <div class="stat-growth" style="color: var(--danger); font-size: 0.8rem;">Stalled tasks</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Avg. Duration</div>
+                <div class="stat-value">2.4d</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">Per workflow cycle</div>
+            </div>
+        </div>
+
+        <!-- Workflow Grid -->
+        <div class="workflow-modern-grid animate-fade delay-2" id="workflowGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px;">
+            <!-- Workflow Cards will be injected here -->
+        </div>
+    </main>
+
+    <script>
+        // Mock Workflow Data
+        let workflows = [
+            { id: 'WF-101', title: 'Financial Audit 2024', status: 'Running', progress: 65, step: 'Internal Review', priority: 'High' },
+            { id: 'WF-102', title: 'New Staff Orientation', status: 'Running', progress: 30, step: 'Department Assignment', priority: 'Medium' },
+            { id: 'WF-103', title: 'Infrastructure Upgrade', status: 'Paused', progress: 10, step: 'Budget Approval', priority: 'Critical' },
+            { id: 'WF-104', title: 'Quality Assurance Cycle', status: 'Completed', progress: 100, step: 'Final Reporting', priority: 'Low' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebarUser();
+            renderWorkflows();
+            updateStats();
+        });
+
+        function loadSidebarUser() {
+            const userData = sessionStorage.getItem('currentUser');
+            if (userData) {
+                const currentUser = JSON.parse(userData);
+                document.getElementById('userNameSidebar').textContent = currentUser.name;
+                document.getElementById('userRoleSidebar').textContent = currentUser.role;
+            }
+        }
+
+        function renderWorkflows() {
+            const grid = document.getElementById('workflowGrid');
+            grid.innerHTML = '';
+            
+            workflows.forEach(wf => {
+                const card = document.createElement('div');
+                card.className = 'glass-panel glass-card animate-fade';
+                card.style.padding = '25px';
+                
+                // FR-407: Response deadlines
+                const deadline = wf.status === 'Completed' ? 'Closed' : 'Feb 24, 2026';
+                const isOverdue = wf.priority === 'Critical' && wf.status !== 'Completed';
+                
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                        <div>
+                            <span class="badge-modern" style="margin-bottom: 8px; background: rgba(0,0,0,0.05);">${wf.id}</span>
+                            <h3 style="margin: 0; font-size: 1.1rem;">${wf.title}</h3>
+                        </div>
+                        <span class="badge-modern ${getPriorityClass(wf.priority)}">${wf.priority}</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                            <span style="color: var(--text-muted);">${wf.step}</span>
+                            <span style="font-weight: 600;">${wf.progress}%</span>
+                        </div>
+                        <div style="height: 6px; background: #eee; border-radius: 10px; overflow: hidden;">
+                            <div style="width: ${wf.progress}%; height: 100%; background: var(--secondary); border-radius: 10px; transition: width 1s ease-in-out;"></div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.75rem; color: ${isOverdue ? 'var(--danger)' : '#666'};">
+                            📅 Deadline: ${deadline} ${isOverdue ? '(Overdue)' : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="badge-modern ${wf.status === 'Completed' ? 'badge-success' : 'badge-info'}">${wf.status}</span>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-modern btn-modern-primary" style="padding: 6px 12px; font-size: 0.8rem;">Take Action</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function getPriorityClass(prio) {
+            switch(prio) {
+                case 'Critical': return 'badge-danger';
+                case 'High': return 'badge-warning';
+                default: return 'badge-info';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('runningCount').textContent = workflows.filter(w => w.status === 'Running').length;
+            document.getElementById('bottleneckCount').textContent = workflows.filter(w => w.status === 'Paused').length;
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar-modern').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

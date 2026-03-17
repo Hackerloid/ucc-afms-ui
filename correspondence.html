@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Correspondence</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+    <style>
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition-standard);
+        }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button type="button" class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html" class="active"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="offline.html"><i>📶</i> <span>Offline Mode</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>Service Correspondence</h1>
+                <p class="subtitle-text">Official internal letters and departmental communications</p>
+            </div>
+            <div class="header-right action-bar">
+                <button type="button" class="btn-modern btn-modern-primary" onclick="openComposeModal()">+ Compose New Letter</button>
+                <div class="notifications" style="cursor: pointer; font-size: 1.2rem;">🔔</div>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <div class="stats-container animate-fade delay-1">
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Unread Letters</div>
+                <div class="stat-value" id="unreadCount">0</div>
+                <div class="stat-growth" style="color: var(--danger); font-size: 0.8rem;">Requires response</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Sent this Month</div>
+                <div class="stat-value" id="sentCount">0</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">Outgoing volume</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Pending Acknowledgement</div>
+                <div class="stat-value">3</div>
+                <div class="stat-growth" style="color: var(--warning); font-size: 0.8rem;">Awaiting recipient</div>
+            </div>
+        </div>
+
+        <!-- Correspondence Content -->
+        <div class="glass-panel animate-fade delay-2" style="padding: 30px; min-height: 400px;">
+            <div class="action-bar" style="justify-content: space-between; margin-bottom: 25px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" class="tab-btn active" id="inboxTab" onclick="switchTab('inbox')">Inbox</button>
+                    <button type="button" class="tab-btn" id="outboxTab" onclick="switchTab('outbox')">Outbox</button>
+                </div>
+                <div style="display: flex; gap: 15px; flex: 1; min-width: 200px;">
+                    <input type="text" id="searchInput" placeholder="Search subject or department..." class="login-input-modern" style="margin-top: 0; width: 100%; max-width: 300px;" onkeyup="filterLetters()">
+                </div>
+            </div>
+
+            <div class="table-container-modern">
+                <table class="modern-table">
+                    <thead id="tableHead">
+                        <!-- Headings will be injected here -->
+                    </thead>
+                    <tbody id="letterTableBody">
+                        <!-- Letters will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Compose Modal -->
+    <div id="composeModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="glass-panel animate-fade" style="background: white; width: 100%; max-width: 600px; padding: 40px; border-radius: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
+                <h2>Compose New Letter</h2>
+                <span style="cursor: pointer; font-size: 1.5rem;" onclick="closeModal('composeModal')">&times;</span>
+            </div>
+            <form id="composeForm" onsubmit="sendLetter(event)">
+                <div class="login-form-group">
+                    <label>Recipient Department</label>
+                        <select id="letterRecipient" class="login-input-modern" required title="Select recipient department">
+                            <option value="Finance">Finance</option>
+                            <option value="Directorate of Human Resource (DHR)">Directorate of Human Resource (DHR)</option>
+                            <option value="Directorate of Academic Affairs">Directorate of Academic Affairs</option>
+                            <option value="Directorate of ICT Services">Directorate of ICT Services</option>
+                            <option value="Registrar's Office">Registrar's Office</option>
+                            <option value="Vice-Chancellor's Office">Vice-Chancellor's Office</option>
+                            <option value="Pro-Vice-Chancellor's Office">Pro-Vice-Chancellor's Office</option>
+                            <option value="School of Business">School of Business</option>
+                            <option value="Faculty of Arts">Faculty of Arts</option>
+                            <option value="Faculty of Social Sciences">Faculty of Social Sciences</option>
+                            <option value="Department of Computer Science & Information Technology">Dept. of Computer Science & IT</option>
+                            <option value="ICT">ICT Unit</option>
+                        </select>
+                </div>
+                <div class="login-form-group">
+                    <label>Subject</label>
+                    <input type="text" id="letterSubject" class="login-input-modern" placeholder="e.g. Request for Budget Revision" required title="Enter letter subject">
+                </div>
+                <div class="login-form-group">
+                    <label>Message Content</label>
+                    <textarea id="letterContent" class="login-input-modern" style="min-height: 150px; resize: vertical;" required title="Enter letter content"></textarea>
+                </div>
+                <div class="login-form-group">
+                    <label>Priority</label>
+                    <select id="letterPriority" class="login-input-modern" title="Select priority level">
+                        <option value="Normal">Normal</option>
+                        <option value="Urgent">Urgent</option>
+                        <option value="Confidential">Confidential</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-modern btn-modern-primary" style="width: 100%; margin-top: 10px;">Send Official Letter</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let letters = [
+            { id: 1, from: 'HR', to: 'Finance', subject: 'Payroll Verification - Feb 2026', date: '2026-02-18', status: 'Unread', priority: 'Urgent', content: 'Please verify the attached payroll data.' },
+            { id: 2, from: 'Registry', to: 'Finance', subject: 'Student Refund Request', date: '2026-02-17', status: 'Read', priority: 'Normal', content: 'Approval needed for student fee refund.' },
+            { id: 3, from: 'Finance', to: 'ICT', subject: 'License Renewal Approval', date: '2026-02-16', status: 'Sent', priority: 'High', content: 'The renewal for cloud services is approved.' }
+        ];
+
+        let currentTab = 'inbox';
+        let currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || { department: 'Finance', name: 'User' };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebarUser();
+            switchTab('inbox');
+            updateStats();
+        });
+
+        function loadSidebarUser() {
+            document.getElementById('userNameSidebar').textContent = currentUser.name;
+            document.getElementById('userRoleSidebar').textContent = currentUser.role;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('inboxTab').classList.toggle('active', tab === 'inbox');
+            document.getElementById('outboxTab').classList.toggle('active', tab === 'outbox');
+            renderLetters();
+        }
+
+        function renderLetters() {
+            const tbody = document.getElementById('letterTableBody');
+            const thead = document.getElementById('tableHead');
+            tbody.innerHTML = '';
+            
+            if (currentTab === 'inbox') {
+                thead.innerHTML = '<tr><th>From</th><th>Subject</th><th>Priority</th><th>Date</th><th>Status</th><th>Action</th></tr>';
+            } else {
+                thead.innerHTML = '<tr><th>To</th><th>Subject</th><th>Priority</th><th>Date</th><th>Status</th><th>Action</th></tr>';
+            }
+
+            const filtered = letters.filter(l => {
+                if (currentTab === 'inbox') return l.to === currentUser.department;
+                return l.from === currentUser.department;
+            });
+
+            filtered.forEach(l => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${currentTab === 'inbox' ? l.from : l.to}</b></td>
+                    <td>
+                        <div style="font-weight:600;">${l.subject}</div>
+                        <div style="font-size:0.8rem; color:#666;">${l.content.substring(0, 40)}...</div>
+                    </td>
+                    <td><span class="badge-modern ${getPriorityClass(l.priority)}">${l.priority}</span></td>
+                    <td>${l.date}</td>
+                    <td><span class="badge-modern ${getStatusClass(l.status)}">${l.status}</span></td>
+                    <td>
+                        <button type="button" class="btn-modern" style="padding: 5px 10px; background: transparent; color: var(--primary); font-size: 0.8rem;" onclick="viewLetter(${l.id})">Open</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getPriorityClass(p) {
+            if (p === 'Urgent') return 'badge-danger';
+            if (p === 'High') return 'badge-warning';
+            return 'badge-info';
+        }
+
+        function getStatusClass(s) {
+            if (s === 'Unread') return 'badge-warning';
+            if (s === 'Read') return 'badge-success';
+            return 'badge-info';
+        }
+
+        function updateStats() {
+            const inbox = letters.filter(l => l.to === currentUser.department);
+            const outbox = letters.filter(l => l.from === currentUser.department);
+            document.getElementById('unreadCount').textContent = inbox.filter(l => l.status === 'Unread').length;
+            document.getElementById('sentCount').textContent = outbox.length;
+        }
+
+        function openComposeModal() { document.getElementById('composeModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function sendLetter(e) {
+            e.preventDefault();
+            const newLetter = {
+                id: letters.length + 1,
+                from: currentUser.department,
+                to: document.getElementById('letterRecipient').value,
+                subject: document.getElementById('letterSubject').value,
+                content: document.getElementById('letterContent').value,
+                priority: document.getElementById('letterPriority').value,
+                date: new Date().toISOString().split('T')[0],
+                status: 'Sent'
+            };
+            letters.unshift(newLetter);
+            switchTab('outbox');
+            updateStats();
+            closeModal('composeModal');
+            e.target.reset();
+            alert('Official letter sent successfully!');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar-modern').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function viewLetter(id) {
+            const letter = letters.find(l => l.id === id);
+            if (letter && currentTab === 'inbox' && letter.status === 'Unread') {
+                letter.status = 'Read';
+                renderLetters();
+                updateStats();
+            }
+            alert(`Subject: ${letter.subject}\n\n${letter.content}`);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html" class="active"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="offline.html"><i>📶</i> <span>Offline Mode</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>Dashboard Overview</h1>
+                <p class="subtitle-text">Welcome back, <span id="welcomeName">Administrator</span></p>
+            </div>
+            <div class="header-right action-bar">
+                <input type="text" placeholder="Search anything..." class="login-input-modern" style="margin-top: 0; width: 250px; padding: 10px 15px;">
+                <div class="notifications" style="cursor: pointer; font-size: 1.2rem;">🔔</div>
+            </div>
+        </header>
+
+        <!-- Stats Section (Aligned with FR-901) -->
+        <div class="stats-container animate-fade delay-1">
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Documents Processed</div>
+                <div class="stat-value" id="completedDocs">0</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">↑ Updated live</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Pending Items</div>
+                <div class="stat-value" id="pendingApprovals">0</div>
+                <div class="stat-growth" style="color: var(--warning); font-size: 0.8rem;">Requires attention</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Overdue Items</div>
+                <div class="stat-value" id="overdueItems" style="color: var(--danger);">0</div>
+                <div class="stat-growth" style="color: var(--danger); font-size: 0.8rem;">Exceeded SLA</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Avg Turnaround</div>
+                <div class="stat-value" id="avgTurnaround">0h</div>
+                <div class="stat-growth" style="color: var(--info); font-size: 0.8rem;">Across all workflows</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content Grid -->
+        <div class="animate-fade delay-2 dashboard-grid">
+            <div class="glass-panel" style="padding: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h3>Recent Activity</h3>
+                    <button type="button" class="btn-modern btn-modern-primary" style="padding: 8px 16px; font-size: 0.8rem;">View All</button>
+                </div>
+                <div id="activityFeed">
+                    <!-- Activities will be injected here -->
+                </div>
+            </div>
+
+            <div class="glass-panel" style="padding: 30px;">
+                <h3>Quick Actions</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                    <button type="button" onclick="window.location.href='documents.html'" class="btn-modern btn-modern-primary">Register New Document</button>
+                    <button type="button" onclick="window.location.href='workflows.html'" class="btn-modern btn-modern-secondary">Launch Workflow</button>
+                    <button type="button" onclick="window.location.href='correspondence.html'" class="btn-modern btn-modern-primary" style="background: var(--info); border: none;">Send Correspondence</button>
+                    <button type="button" onclick="window.location.href='reports.html'" class="btn-modern" style="background: #edf2f7; color: var(--primary);">Generate Report</button>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h3>Storage Status</h3>
+                    <div style="height: 10px; background: #eee; border-radius: 5px; margin: 15px 0; overflow: hidden;">
+                        <div style="width: 65%; height: 100%; background: var(--secondary);"></div>
+                    </div>
+                    <p class="subtitle-text">65GB of 100GB used</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mock data for demonstration
+        const mockDocuments = [
+            { id: 1, title: 'Budget 2025 Proposal', status: 'pending', department: 'Finance', date: '2024-02-15' },
+            { id: 2, title: 'Senate Meeting Minutes', status: 'approved', department: 'Senate', date: '2024-02-14' },
+            { id: 3, title: 'HR Policy Update', status: 'rejected', department: 'HR', date: '2024-02-13' },
+            { id: 4, title: 'IT Infrastructure Report', status: 'completed', department: 'ICT', date: '2024-02-12' }
+        ];
+
+        const mockActivity = [
+            { action: 'Document Registered', user: 'John Doe', time: '2 hours ago' },
+            { action: 'Document Approved', user: 'Jane Smith', time: '4 hours ago' },
+            { action: 'Workflow Updated', user: 'Admin', time: '1 day ago' },
+            { action: 'File Uploaded', user: 'Mike Johnson', time: '2 days ago' }
+        ];
+
+        let currentUser = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentUser();
+            updateStats();
+            renderActivityFeed();
+        });
+
+        function loadCurrentUser() {
+            const userData = sessionStorage.getItem('currentUser');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = JSON.parse(userData);
+            document.getElementById('userNameSidebar').textContent = currentUser.name;
+            document.getElementById('userRoleSidebar').textContent = currentUser.role + ' • ' + currentUser.department;
+            document.getElementById('welcomeName').textContent = currentUser.name.split(' ')[0];
+        }
+
+        function updateStats() {
+            // Mock statistics aligned with FR-901
+            document.getElementById('completedDocs').textContent = '298';
+            document.getElementById('pendingApprovals').textContent = '23';
+            document.getElementById('overdueItems').textContent = '5';
+            document.getElementById('avgTurnaround').textContent = '2.4d';
+        }
+
+        function renderActivityFeed() {
+            const container = document.getElementById('activityFeed');
+            container.innerHTML = '';
+
+            mockActivity.forEach(activity => {
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.padding = '15px 0';
+                item.style.borderBottom = '1px solid #f1f1f1';
+                item.className = 'animate-fade';
+                
+                item.innerHTML = `
+                    <div style="width: 40px; height: 40px; background: #e3f2fd; color: #1976d2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                        📄
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0; font-size: 0.95rem;">${activity.action}</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: #666;">by ${activity.user}</p>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #999;">${activity.time}</div>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar-modern').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Settings</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+    <style>
+        :root {
+            --primary: #0b3c5d;
+            --secondary: #f4b41a;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --text: #333;
+            --bg: #f5f7fa;
+            --card: #ffffff;
+            --border: #e0e0e0;
+        }
+
+        body {
+            background: var(--bg);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Enhanced Sidebar */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--primary), #1a5d8a);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar ul li a.active {
+            background: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .topbar {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .settings-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        /* Sidebar Navigation */
+        .settings-nav {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .nav-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-link {
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: #f8f9fa;
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: #e3f2fd;
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Settings Content */
+        .settings-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(11, 60, 93, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #09314d;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { width: 220px; }
+            .main { margin-left: 220px; }
+            .settings-container { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main { margin-left: 0; padding: 20px; }
+            .form-row { grid-template-columns: 1fr; }
+            .btn-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button type="button" class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="settings.html" class="active"><i>⚙️</i> <span>Settings</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>System Settings</h1>
+                <p class="subtitle-text">Configure system-wide parameters, security policies, and integrations</p>
+            </div>
+            <div class="header-right action-bar">
+                <button type="button" class="btn-modern btn-modern-primary" onclick="saveSettings()">Save Changes</button>
+                <div class="notifications" style="cursor: pointer; font-size: 1.2rem;">🔔</div>
+            </div>
+        </header>
+
+        <!-- Settings Container -->
+        <div class="settings-container">
+            <!-- Navigation -->
+            <nav class="settings-nav">
+                <div class="nav-title">Settings</div>
+                <div class="nav-links">
+                    <a href="#general" class="nav-link active" onclick="showSection('general')">General</a>
+                    <a href="#security" class="nav-link" onclick="showSection('security')">Security</a>
+                    <a href="#notifications" class="nav-link" onclick="showSection('notifications')">Notifications</a>
+                    <a href="#integrations" class="nav-link" onclick="showSection('integrations')">Integrations</a>
+                    <a href="#backup" class="nav-link" onclick="showSection('backup')">Backup & Recovery</a>
+                    <a href="#system" class="nav-link" onclick="showSection('system')">System Info</a>
+                </div>
+            </nav>
+
+            <!-- Content -->
+            <div class="settings-content">
+                <!-- General Settings -->
+                <div id="general-section" class="section-content">
+                    <h2 class="section-title">General Settings</h2>
+                    
+                    <div class="alert alert-warning">
+                        <strong>Note:</strong> Changes to system settings may require administrator approval and system restart.
+                    </div>
+
+                    <div class="form-section">
+                        <h4>System Configuration</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="systemName">System Name</label>
+                                <input type="text" id="systemName" value="UCC DMS">
+                            </div>
+                            <div class="form-group">
+                                <label for="systemVersion">System Version</label>
+                                <input type="text" id="systemVersion" value="1.0.0" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="defaultLanguage">Default Language</label>
+                            <select id="defaultLanguage" class="login-input-modern">
+                                <option value="en" selected>English</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="es">Spanish</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Document Settings</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="maxFileSize">Maximum File Size (MB)</label>
+                                <input type="number" id="maxFileSize" value="50">
+                            </div>
+                            <div class="form-group">
+                                <label for="allowedFormats">Allowed File Formats</label>
+                                <input type="text" id="allowedFormats" value="pdf,doc,docx,xls,xlsx,ppt,pptx,txt,jpg,png">
+                            </div>
+                        </div>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Enable OCR</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Enable Optical Character Recognition for scanned documents</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enableOCR" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Workflow Settings</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="defaultWorkflow">Default Workflow</label>
+                                <select id="defaultWorkflow" class="login-input-modern">
+                                    <option value="standard">Standard Approval</option>
+                                    <option value="fast">Fast Track</option>
+                                    <option value="executive">Executive Review</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="maxWorkflowSteps">Maximum Workflow Steps</label>
+                                <input type="number" id="maxWorkflowSteps" value="10">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="saveGeneralSettings()">Save General Settings</button>
+                        <button class="btn btn-secondary" onclick="testSettings()">Test Settings</button>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div id="security-section" class="section-content" style="display: none;">
+                    <h2 class="section-title">Security Settings</h2>
+
+                    <div class="form-section">
+                        <h4>Authentication</h4>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Enable Two-Factor Authentication</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Require 2FA for all users</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enable2FA" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Session Timeout</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Auto logout after period of inactivity</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enableSessionTimeout" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="sessionTimeoutMinutes">Session Timeout (minutes)</label>
+                            <input type="number" id="sessionTimeoutMinutes" value="30">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Password Policy</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="minPasswordLength">Minimum Password Length</label>
+                                <input type="number" id="minPasswordLength" value="8">
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordExpiryDays">Password Expiry (days)</label>
+                                <input type="number" id="passwordExpiryDays" value="90">
+                            </div>
+                        </div>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Require Special Characters</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Passwords must contain special characters</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="requireSpecialChars" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Access Control</h4>
+                        <div class="form-group">
+                            <label for="maxLoginAttempts">Maximum Login Attempts</label>
+                            <input type="number" id="maxLoginAttempts" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="lockoutDuration">Account Lockout Duration (minutes)</label>
+                            <input type="number" id="lockoutDuration" value="15">
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="saveSecuritySettings()">Save Security Settings</button>
+                        <button class="btn btn-danger" onclick="resetSecuritySettings()">Reset Security</button>
+                    </div>
+                </div>
+
+                <!-- Notifications Settings -->
+                <div id="notifications-section" class="section-content" style="display: none;">
+                    <h2 class="section-title">Notification Settings</h2>
+
+                    <div class="form-section">
+                        <h4>Email Notifications</h4>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Enable Email Notifications</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Send email notifications for system events</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enableEmailNotifications" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="smtpServer">SMTP Server</label>
+                            <input type="text" id="smtpServer" value="smtp.example.com">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="smtpPort">SMTP Port</label>
+                                <input type="number" id="smtpPort" value="587">
+                            </div>
+                            <div class="form-group">
+                                <label for="smtpSecurity">Security</label>
+                                <select id="smtpSecurity" class="login-input-modern">
+                                    <option value="tls">TLS</option>
+                                    <option value="ssl">SSL</option>
+                                    <option value="none">None</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Notification Preferences</h4>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Document Upload Notifications</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Notify when documents are uploaded</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifyDocumentUpload" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Workflow Status Changes</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Notify when workflow status changes</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifyWorkflowChanges" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Deadline Reminders</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Send reminders for approaching deadlines</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifyDeadlineReminders" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="saveNotificationSettings()">Save Notification Settings</button>
+                        <button class="btn btn-secondary" onclick="testEmailSettings()">Test Email Settings</button>
+                    </div>
+                </div>
+
+                <!-- Integrations Settings -->
+                <div id="integrations-section" class="section-content" style="display: none;">
+                    <h2 class="section-title">Integration Settings</h2>
+
+                    <div class="form-section">
+                        <h4>External Systems</h4>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Active Directory Integration</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Connect to Active Directory for user management</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enableADIntegration">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="adServer">AD Server</label>
+                            <input type="text" id="adServer" placeholder="Enter AD server address">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="adDomain">Domain</label>
+                                <input type="text" id="adDomain" placeholder="Enter domain">
+                            </div>
+                            <div class="form-group">
+                                <label for="adUsername">Username</label>
+                                <input type="text" id="adUsername" placeholder="Enter username">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Cloud Storage</h4>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Enable Cloud Storage</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Use cloud storage for document files</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enableCloudStorage">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="cloudProvider">Cloud Provider</label>
+                            <select id="cloudProvider" class="login-input-modern">
+                                <option value="">Select Provider</option>
+                                <option value="aws">Amazon S3</option>
+                                <option value="azure">Azure Blob Storage</option>
+                                <option value="gcp">Google Cloud Storage</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="saveIntegrationSettings()">Save Integration Settings</button>
+                        <button class="btn btn-secondary" onclick="testIntegrations()">Test Integrations</button>
+                    </div>
+                </div>
+
+                <!-- Backup Settings -->
+                <div id="backup-section" class="section-content" style="display: none;">
+                    <h2 class="section-title">Backup & Recovery</h2>
+
+                    <div class="form-section">
+                        <h4>Backup Configuration</h4>
+                        <div class="form-group">
+                            <label for="backupFrequency">Backup Frequency</label>
+                            <select id="backupFrequency" class="login-input-modern">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="backupTime">Backup Time</label>
+                            <input type="time" id="backupTime" value="02:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="backupLocation">Backup Location</label>
+                            <input type="text" id="backupLocation" value="/backups/ucc-afms">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Recovery Options</h4>
+                        <div class="toggle-group">
+                            <div>
+                                <strong>Enable Auto Recovery</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Automatically restore from latest backup on system failure</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enableAutoRecovery">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="retentionPeriod">Backup Retention Period (days)</label>
+                            <input type="number" id="retentionPeriod" value="30">
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="saveBackupSettings()">Save Backup Settings</button>
+                        <button class="btn btn-secondary" onclick="createBackup()">Create Manual Backup</button>
+                        <button class="btn btn-danger" onclick="restoreBackup()">Restore from Backup</button>
+                    </div>
+                </div>
+
+                <!-- System Info -->
+                <div id="system-section" class="section-content" style="display: none;">
+                    <h2 class="section-title">System Information</h2>
+
+                    <div class="form-section">
+                        <h4>System Status</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>System Uptime</label>
+                                <input type="text" value="7 days, 12 hours, 34 minutes" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Database Status</label>
+                                <input type="text" value="Connected" disabled style="color: #28a745; font-weight: bold;">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Storage Usage</label>
+                                <input type="text" value="45.2 GB / 500 GB (9%)" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Active Users</label>
+                                <input type="text" value="156" disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>System Details</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Operating System</label>
+                                <input type="text" value="Ubuntu 20.04 LTS" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Database Version</label>
+                                <input type="text" value="PostgreSQL 13.5" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Web Server</label>
+                                <input type="text" value="Apache 2.4.41" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>PHP Version</label>
+                                <input type="text" value="PHP 8.1.2" disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="checkSystemHealth()">Check System Health</button>
+                        <button class="btn btn-secondary" onclick="generateSystemReport()">Generate System Report</button>
+                        <button class="btn btn-danger" onclick="clearCache()">Clear System Cache</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentUser = null;
+
+        // Initialize settings page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentUser();
+        });
+
+        function loadCurrentUser() {
+            const userData = sessionStorage.getItem('currentUser');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = JSON.parse(userData);
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = currentUser.role + ' • ' + currentUser.department;
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            const sections = ['general', 'security', 'notifications', 'integrations', 'backup', 'system'];
+            sections.forEach(sec => {
+                const element = document.getElementById(sec + '-section');
+                if (element) element.style.display = 'none';
+            });
+
+            // Show selected section
+            const selectedSection = document.getElementById(section + '-section');
+            if (selectedSection) selectedSection.style.display = 'block';
+
+            // Update navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === '#' + section) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        function saveSettings() {
+            alert('Saving all settings...');
+            // In a real implementation, this would save all settings to the backend
+        }
+
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to default? This action cannot be undone.')) {
+                alert('Resetting settings to default values...');
+                // In a real implementation, this would reset settings to defaults
+            }
+        }
+
+        function saveGeneralSettings() {
+            alert('General settings saved successfully!');
+        }
+
+        function saveSecuritySettings() {
+            alert('Security settings saved successfully!');
+        }
+
+        function saveNotificationSettings() {
+            alert('Notification settings saved successfully!');
+        }
+
+        function saveIntegrationSettings() {
+            alert('Integration settings saved successfully!');
+        }
+
+        function saveBackupSettings() {
+            alert('Backup settings saved successfully!');
+        }
+
+        function resetSecuritySettings() {
+            if (confirm('Reset security settings to default?')) {
+                alert('Security settings reset to default values.');
+            }
+        }
+
+        function testSettings() {
+            alert('Testing system settings...');
+        }
+
+        function testEmailSettings() {
+            alert('Testing email configuration...');
+        }
+
+        function testIntegrations() {
+            alert('Testing integrations...');
+        }
+
+        function createBackup() {
+            alert('Creating manual backup...');
+        }
+
+        function restoreBackup() {
+            if (confirm('Restore system from backup? This will overwrite current data.')) {
+                alert('Restoring system from backup...');
+            }
+        }
+
+        function checkSystemHealth() {
+            alert('Checking system health...');
+        }
+
+        function generateSystemReport() {
+            alert('Generating system report...');
+        }
+
+        function clearCache() {
+            if (confirm('Clear system cache?')) {
+                alert('System cache cleared successfully.');
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar-modern').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

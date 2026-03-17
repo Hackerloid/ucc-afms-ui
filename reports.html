@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Reports</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button type="button" class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html" class="active"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="offline.html"><i>📶</i> <span>Offline Mode</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>Insights &amp; Analytics</h1>
+                <p class="subtitle-text">Generate comprehensive reports on file movements and system usage</p>
+            </div>
+            <div class="header-right action-bar">
+                <button type="button" class="btn-modern btn-modern-primary" onclick="alert('Generating Real-time Report...')">Generate All</button>
+                <div class="notifications" style="cursor: pointer; font-size: 1.2rem;">🔔</div>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <div class="stats-container animate-fade delay-1">
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Processed Monthly</div>
+                <div class="stat-value">1,482</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">↑ 12% increase</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Active Departments</div>
+                <div class="stat-value">14</div>
+                <div class="stat-growth" style="color: var(--info); font-size: 0.8rem;">Using the system</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Report Accuracy</div>
+                <div class="stat-value">99.9%</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">Verified by system</div>
+            </div>
+        </div>
+
+        <!-- Report Sections -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;" class="animate-fade delay-2">
+            <!-- Recent Reports Table -->
+            <div class="glass-panel" style="padding: 30px;">
+                <h3>Recent System Analytics</h3>
+                <div class="table-container-modern" style="margin-top: 25px;">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Report Name</th>
+                                <th>Type</th>
+                                <th>Generated</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Monthly Document Traffic</td>
+                                <td><span class="badge-modern badge-info">PDF</span></td>
+                                <td>2 hours ago</td>
+                                <td><button type="button" class="btn-modern" style="padding: 5px 10px; background: transparent; color: var(--primary); font-size: 0.8rem;">Download</button></td>
+                            </tr>
+                            <tr>
+                                <td>User Activity Audit Log</td>
+                                <td><span class="badge-modern badge-success">CSV</span></td>
+                                <td>Yesterday</td>
+                                <td><button type="button" class="btn-modern" style="padding: 5px 10px; background: transparent; color: var(--primary); font-size: 0.8rem;">Download</button></td>
+                            </tr>
+                            <tr>
+                                <td>Departmental Storage Usage</td>
+                                <td><span class="badge-modern badge-info">PDF</span></td>
+                                <td>3 days ago</td>
+                                <td><button type="button" class="btn-modern" style="padding: 5px 10px; background: transparent; color: var(--primary); font-size: 0.8rem;">Download</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Report Configuration -->
+            <div class="glass-panel" style="padding: 30px;">
+                <h3>Custom Reports</h3>
+                <div style="margin-top: 20px;">
+                    <div class="login-form-group">
+                        <label>Report Type</label>
+                        <select class="login-input-modern" title="Select Report Type">
+                            <option>System Usage</option>
+                            <option>File Statistics</option>
+                            <option>User Audits</option>
+                        </select>
+                    </div>
+                    <div class="login-form-group">
+                        <label>Date Range</label>
+                        <input type="date" class="login-input-modern" style="margin-bottom: 10px;" title="Start Date">
+                        <input type="date" class="login-input-modern" title="End Date">
+                    </div>
+                    <button type="button" class="btn-modern btn-modern-primary" style="width: 100%; margin-top: 20px;">Run Analysis</button>
+                    <button type="button" class="btn-modern btn-modern-secondary" style="width: 100%; margin-top: 10px;">Export as Excel</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebarUser();
+        });
+
+        function loadSidebarUser() {
+            const userData = sessionStorage.getItem('currentUser');
+            if (userData) {
+                const currentUser = JSON.parse(userData);
+                document.getElementById('userNameSidebar').textContent = currentUser.name;
+                document.getElementById('userRoleSidebar').textContent = currentUser.role;
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar-modern').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

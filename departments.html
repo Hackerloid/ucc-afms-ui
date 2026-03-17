@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Departments</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+    <style>
+        .college-accordion {
+            margin-bottom: 20px;
+            overflow: hidden;
+            border-radius: 12px;
+            transition: var(--transition-standard);
+        }
+        
+        .college-trigger {
+            padding: 18px 25px;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primary);
+            transition: var(--transition-fast);
+        }
+        
+        .college-trigger:hover {
+            background: white;
+            padding-left: 30px;
+        }
+        
+        .college-body {
+            display: none;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .college-accordion.active .college-body {
+            display: block;
+        }
+        
+        .college-accordion.active .college-trigger {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .faculty-modern-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+        
+        .dept-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button type="button" class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html" class="active"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="offline.html"><i>📶</i> <span>Offline Mode</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>University Registry</h1>
+                <p class="subtitle-text">Browse and manage colleges, faculties, and departments</p>
+            </div>
+            <div class="header-right action-bar">
+                <button type="button" class="btn-modern btn-modern-primary" onclick="alert('Add Department flow coming soon')">+ New Department</button>
+                <div class="notifications" style="cursor: pointer; font-size: 1.2rem;">🔔</div>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <div class="stats-container animate-fade delay-1">
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Colleges</div>
+                <div class="stat-value" id="totalColleges">0</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">Core institutions</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Faculties</div>
+                <div class="stat-value" id="totalFaculties">0</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">Academic groups</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Departments</div>
+                <div class="stat-value" id="totalDepartments">0</div>
+                <div class="stat-growth" style="color: var(--info); font-size: 0.8rem;">Instructional units</div>
+            </div>
+        </div>
+
+        <!-- Search Box -->
+        <div class="glass-panel animate-fade delay-2" style="padding: 20px; margin-bottom: 30px;">
+            <input type="text" id="searchInput" placeholder="Search by college, faculty or department name..." class="login-input-modern" style="margin: 0; border: none; background: transparent;">
+        </div>
+
+        <!-- Department List -->
+        <div id="departmentsContainer" class="animate-fade delay-3">
+            <!-- Injected via JS -->
+        </div>
+    </main>
+
+    <script>
+        const universityStructure = [
+            {
+                name: "College of Humanities & Legal Studies",
+                faculties: [
+                    {
+                        name: "Faculty of Arts",
+                        departments: ["Centre for African & International Studies", "Confucius Institute", "Department of Classics and Philosophy", "Department of Communication Studies", "Department of English", "Department of French", "Department of Ghanaian Languages and Linguistics", "Department of History", "Department of Music and Dance", "Department of Religion and Human Values", "Department of Theatre and Film Studies", "Information and Literacy Skills Unit"]
+                    },
+                    {
+                        name: "Faculty of Social Sciences",
+                        departments: ["Centre for Gender Research, Advocacy & Documentation", "Department of Geography and Regional Planning", "Department of Hospitality and Tourism Management", "Department of Population and Health", "Department of Sociology and Anthropology", "Institute for Oil and Gas Studies"]
+                    },
+                    {
+                        name: "School of Business",
+                        departments: ["Centre for Entrepreneurship & Small Enterprise", "Department of Accounting", "Department of Finance", "Department of Human Resource Management", "Department of Management", "Department of Marketing and Supply Chain Management"]
+                    }
+                ]
+            },
+            {
+                name: "College of Education Studies",
+                faculties: [
+                    {
+                        name: "Faculty of Educational Foundations",
+                        departments: ["Centre for Child Development Research & Referral", "Counselling Centre", "Department of Basic Education", "Department of Education & Psychology", "Department of Guidance and Counseling"]
+                    },
+                    {
+                        name: "Faculty of Science & Technology Education",
+                        departments: ["Department of Health, Physical Education & Recreation", "Department of Mathematics & ICT Education", "Department of Science Education", "Department of Vocational & Technical Education"]
+                    }
+                ]
+            },
+            {
+                name: "College of Agriculture and Natural Sciences",
+                faculties: [
+                    {
+                        name: "School of Biological Sciences",
+                        departments: ["Centre for Coastal Management", "Department of Biochemistry", "Department of Conservation Biology & Entomology", "Department of Environmental Science", "Department of Fisheries & Aquatic Sciences"]
+                    },
+                    {
+                        name: "School of Physical Sciences",
+                        departments: ["Department of Chemistry", "Department of Computer Science & Information Technology", "Department of Laboratory Technology", "Department of Mathematics", "Department of Physics"]
+                    }
+                ]
+            },
+            {
+                name: "Principal Offices",
+                faculties: [
+                    {
+                        name: "Core Leadership",
+                        departments: ["Vice-Chancellor's Office", "Pro-Vice-Chancellor's Office", "Registrar's Office", "Bursar / Directorate of Finance"]
+                    },
+                    {
+                        name: "Directorates & Administrative",
+                        departments: ["Directorate of Academic Affairs", "Directorate of Public Affairs", "Directorate of Human Resource (DHR)", "Directorate of Internal Audit", "Directorate of ICT Services", "Directorate of Research, Innovation & Consultancy"]
+                    }
+                ]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebarUser();
+            renderDepartments();
+            updateStats();
+        });
+
+        function loadSidebarUser() {
+            const userData = sessionStorage.getItem('currentUser');
+            if (userData) {
+                const currentUser = JSON.parse(userData);
+                document.getElementById('userNameSidebar').textContent = currentUser.name;
+                document.getElementById('userRoleSidebar').textContent = currentUser.role;
+            }
+        }
+
+        function renderDepartments() {
+            const container = document.getElementById('departmentsContainer');
+            container.innerHTML = '';
+            
+            universityStructure.forEach((college, index) => {
+                const accordion = document.createElement('div');
+                accordion.className = 'college-accordion glass-panel';
+                accordion.id = `college-${index}`;
+                
+                accordion.innerHTML = `
+                    <div class="college-trigger" onclick="toggleCollege(${index})">
+                        <span>${college.name}</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="college-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                            ${college.faculties.map(faculty => `
+                                <div class="faculty-modern-card glass-panel">
+                                    <h4 style="margin-bottom: 15px; color: var(--primary);">${faculty.name}</h4>
+                                    <div>
+                                        ${faculty.departments.map(dept => `<div class="dept-item">${dept}</div>`).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(accordion);
+            });
+        }
+
+        function toggleCollege(index) {
+            const el = document.getElementById(`college-${index}`);
+            el.classList.toggle('active');
+            const icon = el.querySelector('.icon');
+            icon.textContent = el.classList.contains('active') ? '▲' : '▼';
+        }
+
+        function updateStats() {
+            let faculties = 0;
+            let depts = 0;
+            universityStructure.forEach(c => {
+                faculties += c.faculties.length;
+                c.faculties.forEach(f => depts += f.departments.length);
+            });
+            document.getElementById('totalColleges').textContent = universityStructure.length;
+            document.getElementById('totalFaculties').textContent = faculties;
+            document.getElementById('totalDepartments').textContent = depts;
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Search logic
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const accordions = document.querySelectorAll('.college-accordion');
+            
+            accordions.forEach((acc, index) => {
+                const text = acc.innerText.toLowerCase();
+                if (text.includes(term)) {
+                    acc.style.display = 'block';
+                    if (term.length > 2) acc.classList.add('active');
+                } else {
+                    acc.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

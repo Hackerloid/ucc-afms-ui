@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Users</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button type="button" class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html" class="active"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="offline.html"><i>📶</i> <span>Offline Mode</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>User Management</h1>
+                <p class="subtitle-text">Manage system access and roles across departments</p>
+            </div>
+            <div class="header-right action-bar">
+                <button type="button" class="btn-modern btn-modern-primary" onclick="openAddUserModal()">+ Add New User</button>
+                <div class="notifications" style="cursor: pointer; font-size: 1.2rem;">🔔</div>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <div class="stats-container animate-fade delay-1">
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">Active system members</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Active Now</div>
+                <div class="stat-value" id="activeUsers">0</div>
+                <div class="stat-growth" style="color: var(--success); font-size: 0.8rem;">Currently logged in</div>
+            </div>
+            <div class="stat-modern-card glass-panel">
+                <div class="stat-label">Administrators</div>
+                <div class="stat-value" id="adminCount">0</div>
+                <div class="stat-growth" style="color: var(--info); font-size: 0.8rem;">Privileged accounts</div>
+            </div>
+        </div>
+
+        <!-- Users Table Section -->
+        <div class="glass-panel animate-fade delay-2" style="padding: 30px; min-height: 400px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <div style="display: flex; gap: 15px;">
+                    <input type="text" id="searchInput" placeholder="Search users..." class="login-input-modern" style="margin-top: 0; width: 300px;" onkeyup="filterUsers()">
+                    <select id="roleFilter" class="login-input-modern" style="margin-top: 0; width: 170px;" onchange="filterUsers()">
+                        <option value="">All Roles</option>
+                        <option value="Super Admin">Super Admin</option>
+                        <option value="Department Admin">Department Admin</option>
+                        <option value="Officer">Officer</option>
+                        <option value="Viewer">Viewer</option>
+                    </select>
+                </div>
+                <button type="button" class="btn-modern" style="background: #edf2f7; color: var(--primary);" onclick="exportUsers()">Export Directory</button>
+            </div>
+
+            <div class="table-container-modern">
+                <table class="modern-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add User Modal (Modernized) -->
+    <div id="addUserModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="glass-panel animate-fade" style="background: white; width: 100%; max-width: 500px; padding: 40px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                <h2>Register New User</h2>
+                <span style="cursor: pointer; font-size: 1.5rem;" onclick="closeModal('addUserModal')">&times;</span>
+            </div>
+            <form id="addUserForm" onsubmit="addUser(event)">
+                <div class="login-form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="newUserName" class="login-input-modern" required>
+                </div>
+                <div class="login-form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="newUserEmail" class="login-input-modern" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="login-form-group">
+                        <label>Role</label>
+                        <select id="newUserRole" class="login-input-modern">
+                            <option value="Super Admin">Super Admin</option>
+                            <option value="Department Admin">Department Admin</option>
+                            <option value="Officer">Officer</option>
+                            <option value="Viewer">Viewer</option>
+                        </select>
+                    </div>
+                    <div class="login-form-group">
+                        <label>Department</label>
+                        <select id="newUserDept" class="login-input-modern">
+                            <option value="Finance">Finance</option>
+                            <option value="Directorate of Human Resource (DHR)">Directorate of Human Resource (DHR)</option>
+                            <option value="Directorate of Academic Affairs">Directorate of Academic Affairs</option>
+                            <option value="Directorate of ICT Services">Directorate of ICT Services</option>
+                            <option value="Registrar's Office">Registrar's Office</option>
+                            <option value="Vice-Chancellor's Office">Vice-Chancellor's Office</option>
+                            <option value="Department of Computer Science & Information Technology">Dept. of Computer Science & IT</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-modern btn-modern-primary" style="width: 100%; margin-top: 20px;">Create User Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Mock User Data (Aligned with FR-104)
+        let users = [
+            { name: 'John Doe', email: 'john@ucc.edu.gh', role: 'Super Admin', department: 'Finance', status: 'Active', lastLogin: '2024-02-19 09:30' },
+            { name: 'Jane Smith', email: 'jane@ucc.edu.gh', role: 'Department Admin', department: 'HR', status: 'Active', lastLogin: '2024-02-18 14:15' },
+            { name: 'Michael Boateng', email: 'm.boateng@ucc.edu.gh', role: 'Viewer', department: 'Registry', status: 'Inactive', lastLogin: '2024-01-20 10:00' },
+            { name: 'Sarah Mensah', email: 'sarah@ucc.edu.gh', role: 'Officer', department: 'Finance', status: 'Active', lastLogin: '2024-02-19 11:20' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebarUser();
+            renderUsers();
+            updateStats();
+        });
+
+        function loadSidebarUser() {
+            const userData = sessionStorage.getItem('currentUser');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const currentUser = JSON.parse(userData);
+            document.getElementById('userNameSidebar').textContent = currentUser.name;
+            document.getElementById('userRoleSidebar').textContent = currentUser.role;
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            users.forEach((user, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div style="font-weight:600;">${user.name}</div>
+                        <div style="font-size:0.8rem; color:#666;">${user.email}</div>
+                    </td>
+                    <td><span class="badge-modern ${getRoleBadgeClass(user.role)}">${user.role}</span></td>
+                    <td>${user.department}</td>
+                    <td><span class="badge-modern ${user.status === 'Active' ? 'badge-success' : 'badge-danger'}">${user.status}</span></td>
+                    <td style="font-size:0.85rem; color:#666;">${user.lastLogin}</td>
+                    <td>
+                        <button type="button" onclick="editUser(${index})" class="btn-modern" style="padding: 5px 10px; background: transparent; color: var(--primary); font-size: 0.8rem;">Edit</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getRoleBadgeClass(role) {
+            switch(role) {
+                case 'Super Admin': return 'badge-danger';
+                case 'Department Admin': return 'badge-warning';
+                case 'Officer': return 'badge-success';
+                default: return 'badge-info';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('activeUsers').textContent = users.filter(u => u.status === 'Active').length;
+            document.getElementById('adminCount').textContent = users.filter(u => u.role.includes('Admin')).length;
+        }
+
+        function filterUsers() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const role = document.getElementById('roleFilter').value;
+            
+            const filtered = users.filter(user => {
+                const matchesSearch = user.name.toLowerCase().includes(search) || user.email.toLowerCase().includes(search);
+                const matchesRole = role === '' || user.role === role;
+                return matchesSearch && matchesRole;
+            });
+
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            filtered.forEach((user, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div style="font-weight:600;">${user.name}</div>
+                        <div style="font-size:0.8rem; color:#666;">${user.email}</div>
+                    </td>
+                    <td><span class="badge-modern ${getRoleBadgeClass(user.role)}">${user.role}</span></td>
+                    <td>${user.department}</td>
+                    <td><span class="badge-modern ${user.status === 'Active' ? 'badge-success' : 'badge-danger'}">${user.status}</span></td>
+                    <td style="font-size:0.85rem; color:#666;">${user.lastLogin}</td>
+                    <td>
+                        <button type="button" onclick="editUser(${index})" class="btn-modern" style="padding: 5px 10px; background: transparent; color: var(--primary); font-size: 0.8rem;">Edit</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function addUser(e) {
+            e.preventDefault();
+            const newUser = {
+                name: document.getElementById('newUserName').value,
+                email: document.getElementById('newUserEmail').value,
+                role: document.getElementById('newUserRole').value,
+                department: document.getElementById('newUserDept').value,
+                status: 'Active',
+                lastLogin: 'Never'
+            };
+            users.unshift(newUser);
+            renderUsers();
+            updateStats();
+            closeModal('addUserModal');
+            e.target.reset();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar-modern').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

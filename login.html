@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 40%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-container-modern {
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 24px;
+            text-align: center;
+        }
+
+        .logo-modern i {
+            font-size: 3rem;
+            color: var(--accent); /* UCC Gold for the logo icon */
+            margin-bottom: 20px;
+            display: inline-block;
+            filter: drop-shadow(0 0 10px rgba(255, 192, 0, 0.3));
+        }
+
+        .login-form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .login-form-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-left: 5px;
+        }
+
+        .login-input-modern {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition-standard);
+            margin-top: 8px;
+        }
+
+        .login-input-modern:focus {
+            background: white;
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.1);
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .forgot-link {
+            display: block;
+            margin-top: 20px;
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+
+        .forgot-link:hover { color: var(--secondary); }
+
+        /* Animation Delays */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="login-container-modern glass-panel animate-fade">
+        <div class="logo-modern">
+            <i class="animate-fade delay-1">📄</i>
+            <h1 class="animate-fade delay-2">UCC DMS</h1>
+            <p class="animate-fade delay-2 subtitle-text">Automated File Management System</p>
+        </div>
+
+        <form id="loginForm" class="login-form">
+            <div class="error-message" id="loginError"></div>
+            
+            <div class="login-form-group animate-fade delay-3">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="login-input-modern" placeholder="name@ucc.edu.gh" required>
+            </div>
+
+            <div class="login-form-group animate-fade delay-4">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="login-input-modern" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-modern btn-modern-primary btn-full animate-fade delay-4">Sign In</button>
+        </form>
+
+        <div id="mfaSection" class="mfa-section" style="display: none;">
+            <h3 class="mfa-title">Verification Required</h3>
+            <p class="mfa-subtitle">A code has been sent to your email.</p>
+            
+            <div class="mfa-code" id="mfaCode" style="font-size: 24px; font-weight: bold; margin: 20px 0;">000000</div>
+            
+            <div class="login-form-group">
+                <label for="mfaInput">Verification Code</label>
+                <input type="text" id="mfaInput" class="login-input-modern" placeholder="123456" maxlength="6">
+            </div>
+
+            <div class="mfa-actions" style="display: flex; gap: 10px;">
+                <button type="button" class="btn-modern btn-modern-primary flex-1" onclick="verifyMFA()">Verify</button>
+                <button type="button" class="btn-modern btn-modern-secondary flex-1" onclick="resendMFA()">Resend</button>
+            </div>
+        </div>
+
+        <div class="animate-fade delay-4">
+            <a href="#" class="forgot-link" onclick="showForgotPassword()">Forgot Password?</a>
+        </div>
+        
+        <div class="success-message" id="successMessage" style="display: none; color: var(--success); margin-top: 15px;"></div>
+    </div>
+
+    <script>
+        // Mock user database for demo
+        const mockUsers = [
+            {
+                id: 1,
+                email: 'admin@ucc.edu.gh',
+                password: 'admin123',
+                name: 'System Administrator',
+                role: 'Super Admin',
+                department: 'Administration',
+                mfaEnabled: true
+            },
+            {
+                id: 2,
+                email: 'deptadmin@ucc.edu.gh',
+                password: 'dept123',
+                name: 'Department Admin',
+                role: 'Department Admin',
+                department: 'Registry',
+                mfaEnabled: false
+            },
+            {
+                id: 3,
+                email: 'officer@ucc.edu.gh',
+                password: 'officer123',
+                name: 'Document Officer',
+                role: 'Officer',
+                department: 'Finance',
+                mfaEnabled: false
+            },
+            {
+                id: 4,
+                email: 'viewer@ucc.edu.gh',
+                password: 'viewer123',
+                name: 'Document Viewer',
+                role: 'Viewer',
+                department: 'HR',
+                mfaEnabled: false
+            },
+            {
+                id: 5,
+                email: 'ict@ucc.edu.gh',
+                password: 'ict123',
+                name: 'ICT Specialist',
+                role: 'Officer',
+                department: 'Directorate of ICT Services',
+                mfaEnabled: false
+            },
+            {
+                id: 6,
+                email: 'physics@ucc.edu.gh',
+                password: 'physics123',
+                name: 'Physics Dept Head',
+                role: 'Department Admin',
+                department: 'Department of Physics',
+                mfaEnabled: false
+            }
+        ];
+
+        let currentUser = null;
+        let mfaCode = '';
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            loginUser();
+        });
+
+        function loginUser() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            // Find user
+            const user = mockUsers.find(u => u.email === email && u.password === password);
+
+            if (!user) {
+                showError('Invalid email or password');
+                return;
+            }
+
+            currentUser = user;
+
+            // Check if MFA is enabled
+            if (user.mfaEnabled) {
+                showMFA();
+            } else {
+                loginSuccess();
+            }
+        }
+
+        function showMFA() {
+            // Generate random 6-digit code
+            mfaCode = Math.floor(100000 + Math.random() * 900000).toString();
+            document.getElementById('mfaCode').textContent = mfaCode;
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mfaSection').style.display = 'block';
+        }
+
+        function verifyMFA() {
+            const inputCode = document.getElementById('mfaInput').value;
+            if (inputCode === mfaCode) {
+                loginSuccess();
+            } else {
+                showError('Invalid verification code');
+            }
+        }
+
+        function resendMFA() {
+            mfaCode = Math.floor(100000 + Math.random() * 900000).toString();
+            document.getElementById('mfaCode').textContent = mfaCode;
+            showSuccess('New code sent to your email');
+        }
+
+        function loginSuccess() {
+            // Store user in session storage
+            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.style.color = 'var(--danger)';
+            errorDiv.style.marginBottom = '15px';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function showForgotPassword() {
+            alert('Password reset functionality would be implemented here. Please contact your system administrator.');
+        }
+
+        // Check if already logged in
+        if (sessionStorage.getItem('currentUser')) {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

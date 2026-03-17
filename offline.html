@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC DMS - Offline Mode</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-afms.css">
+    <style>
+        .offline-hero {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .pulse-yellow {
+            width: 120px;
+            height: 120px;
+            background: rgba(244, 180, 26, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: pulseGold 2s infinite;
+        }
+
+        .pulse-yellow i {
+            font-size: 4rem;
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <button type="button" class="mobile-toggle" onclick="toggleMobileMenu()" title="Toggle Menu">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar-modern animate-slide-left">
+        <div class="sidebar-brand">
+            <h2>UCC DMS</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i>📊</i> <span>Dashboard</span></a></li>
+            <li><a href="documents.html"><i>📂</i> <span>Documents</span></a></li>
+            <li><a href="departments.html"><i>🏛️</i> <span>Departments</span></a></li>
+            <li><a href="users.html"><i>👥</i> <span>Users</span></a></li>
+            <li><a href="correspondence.html"><i>✉️</i> <span>Correspondence</span></a></li>
+            <li><a href="workflows.html"><i>⚙️</i> <span>Workflows</span></a></li>
+            <li><a href="reports.html"><i>📈</i> <span>Reports</span></a></li>
+            <li><a href="offline.html" class="active"><i>📶</i> <span>Offline Mode</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-profile-info">
+                <div class="user-profile-name" id="userNameSidebar">User Name</div>
+                <div class="user-profile-role" id="userRoleSidebar">Role</div>
+            </div>
+            <button type="button" onclick="logout()" class="btn-modern btn-modern-logout" style="width: 100%;"><i>🚪</i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Modern Header -->
+        <header class="page-header glass-panel animate-fade">
+            <div class="header-left">
+                <h1>Connection Status</h1>
+                <p class="subtitle-text">System is operating in local-only mode (FR-1308)</p>
+            </div>
+            <div class="header-right action-bar">
+                <span class="badge-modern badge-warning" style="padding: 10px 20px;">
+                    <span style="display:inline-block; width:8px; height:8px; background:var(--secondary); border-radius:50%; margin-right:8px; animation: fadeIn 1s infinite alternate;"></span>
+                    Offline Mode Active
+                </span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Last Cloud Sync: Feb 19, 2026 14:45</span>
+            </div>
+        </header>
+
+        <!-- Offline Content -->
+        <div class="glass-panel animate-fade delay-1" style="padding: 60px; text-align: center;">
+            <div class="pulse-yellow">
+                <i>📶</i>
+            </div>
+            <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Limited Functionality</h2>
+            <p style="max-width: 600px; margin: 0 auto 40px; color: var(--text-muted); font-size: 1.1rem;">
+                We've detected that you're currently offline. You can still browse previously cached documents and queue new uploads, but synchronization with the main server is temporarily disabled.
+            </p>
+            
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <button class="btn-modern btn-modern-primary" onclick="checkConnection()">Try Reconnecting</button>
+                <button class="btn-modern btn-modern-secondary" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;" class="animate-fade delay-2">
+            <div class="glass-panel" style="padding: 30px;">
+                <h3>Cached Documents</h3>
+                <p class="subtitle-text">Available for offline viewing</p>
+                <div class="table-container-modern" style="margin-top: 20px;">
+                    <table class="modern-table">
+                        <tbody>
+                            <tr>
+                                <td>Budget_Final_2024.pdf</td>
+                                <td><span class="badge-modern badge-success">Cached</span></td>
+                            </tr>
+                            <tr>
+                                <td>Minutes_Senate_Oct.docx</td>
+                                <td><span class="badge-modern badge-success">Cached</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="padding: 30px;">
+                <h3>Pending Sync</h3>
+                <p class="subtitle-text">Documents queued for upload</p>
+                <div style="text-align: center; padding: 40px 0;">
+                    <p style="color: var(--text-muted); font-style: italic;">No pending documents in queue</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebarUser();
+        });
+
+        function loadSidebarUser() {
+            const userData = sessionStorage.getItem('currentUser');
+            if (userData) {
+                const currentUser = JSON.parse(userData);
+                document.getElementById('userNameSidebar').textContent = currentUser.name;
+                document.getElementById('userRoleSidebar').textContent = currentUser.role;
+            }
+        }
+
+        function checkConnection() {
+            alert('Checking network connection... Please wait.');
+            setTimeout(() => {
+                alert('Still offline. Any changes made will be stored locally.');
+            }, 1000);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.sidebar-modern').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
