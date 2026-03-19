@@ -5,39 +5,58 @@ import { useAuth } from '../context/AuthContext';
 export default function TopHeader() {
   const { user } = useAuth();
   return (
-    <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-gray-200">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex-1 max-w-xl">
+    <header className="bg-white/60 backdrop-blur-xl shadow-[0_1px_0_0_rgba(0,0,0,0.05)] sticky top-0 z-40 border-b border-white/40 px-8 py-3">
+      <div className="flex items-center justify-between max-w-[1600px] mx-auto">
+        <div className="flex-1 max-w-2xl">
           <div className="relative group">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 group-focus-within:text-ucc-blue transition-colors">
               <Search size={18} />
             </span>
             <input 
               type="text" 
-              placeholder="Search documents, records..." 
-              className="w-full bg-gray-100/50 border border-transparent rounded-full py-2 pl-10 pr-4 focus:bg-white focus:border-ucc-blue/30 focus:ring-2 focus:ring-ucc-blue/20 transition-all outline-none"
+              placeholder="Search documents, records, or institutional memos..." 
+              className="w-full bg-gray-50/80 border border-gray-200/50 rounded-2xl py-2.5 pl-11 pr-5 focus:bg-white focus:border-ucc-blue/30 focus:ring-4 focus:ring-ucc-blue/5 transition-all outline-none text-sm shadow-inner"
             />
+            <div className="absolute inset-y-0 right-3 flex items-center">
+              <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-gray-400 bg-white border border-gray-200 rounded-lg">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </div>
           </div>
         </div>
         
-        <div className="flex items-center space-x-6 ml-4">
-          <Link to="/offline" className="hidden md:flex items-center text-sm font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full hover:bg-amber-100 transition-colors">
-            <span className="w-2 h-2 rounded-full bg-amber-500 mr-2 animate-pulse"></span>
-            Offline Mode
-          </Link>
-          
-          <button className="relative p-2 text-gray-500 hover:text-ucc-blue hover:bg-gray-100 rounded-full transition-colors">
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-          </button>
-          
-          <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-            <div className="hidden text-right md:block">
-              <p className="text-sm font-semibold text-gray-800">{user?.name || 'Guest User'}</p>
-              <p className="text-xs text-gray-500">{user?.role || 'Access Restricted'}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-ucc-blue/10 flex items-center justify-center text-ucc-blue border border-ucc-blue/20">
+        <div className="flex items-center gap-2 ml-8">
+          <div className="flex items-center gap-1 mr-4">
+            <div className="h-8 w-[1px] bg-gray-200 mx-2"></div>
+            <button className="p-2.5 text-gray-500 hover:text-ucc-blue hover:bg-ucc-blue/5 rounded-xl transition-all relative group">
+              <Bell size={20} />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-ucc-red rounded-full border-2 border-white ring-2 ring-ucc-red/20"></span>
+              <div className="absolute top-full right-0 mt-2 bg-white shadow-xl border border-gray-100 rounded-xl p-3 w-64 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all translate-y-2 group-hover:translate-y-0 z-50 pointer-events-none">
+                <p className="text-xs font-bold text-gray-900 mb-2 uppercase tracking-tight">Recent Notifications</p>
+                <div className="space-y-2">
+                  <div className="text-[11px] text-gray-600 border-l-2 border-ucc-blue pl-2 py-1">New memo from Academic Affairs</div>
+                  <div className="text-[11px] text-gray-600 border-l-2 border-ucc-gold pl-2 py-1">Meeting scheduled for 2:00 PM</div>
+                </div>
+              </div>
+            </button>
+            <button className="p-2.5 text-gray-500 hover:text-ucc-blue hover:bg-ucc-blue/5 rounded-xl transition-all">
               <User size={20} />
+            </button>
+          </div>
+          
+          <div className="flex items-center gap-4 pl-6 border-l border-gray-100">
+            <div className="hidden text-right lg:block">
+              <p className="text-sm font-black text-gray-900 leading-tight tracking-tight">{user?.name}</p>
+              <div className="flex items-center justify-end gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-ucc-blue animate-pulse-soft"></span>
+                <p className="text-[10px] font-bold text-ucc-blue/60 uppercase tracking-widest">{user?.role}</p>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-ucc-blue to-ucc-blue/80 flex items-center justify-center text-white shadow-lg shadow-ucc-blue/20 ring-2 ring-white overflow-hidden group cursor-pointer hover:scale-105 transition-transform">
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span className="text-sm font-bold">{user?.name?.split(' ').map(n => n[0]).join('')}</span>
+              </div>
             </div>
           </div>
         </div>

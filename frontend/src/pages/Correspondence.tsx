@@ -1,12 +1,29 @@
-import { Mail, ArrowUpRight, ArrowDownLeft, Search, Filter, Paperclip } from 'lucide-react';
+import { useState } from 'react';
+import { Mail, ArrowUpRight, ArrowDownLeft, Search, Filter, Paperclip, X, Send, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Correspondence() {
+  const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showComposeModal, setShowComposeModal] = useState(false);
+  const [activeFolder, setActiveFolder] = useState('Incoming');
+
   const messagesData = [
-    { id: 'MSG-001', type: 'Incoming', sender: 'Ministry of Education', subject: 'Updated Curriculum Guidelines for 2026/2027 Academic Year', date: 'Today, 10:45 AM', urgent: true, read: false },
-    { id: 'MSG-002', type: 'Outgoing', sender: 'Vice Chancellor Office', subject: 'Invitation to Annual Research Symposium', date: 'Yesterday', urgent: false, read: true },
-    { id: 'MSG-003', type: 'Internal', sender: 'Registrar', subject: 'Notice of Academic Board Meeting', date: 'Oct 15, 2026', urgent: false, read: true },
-    { id: 'MSG-004', type: 'Incoming', sender: 'Ghana Tertiary Education Commission', subject: 'Accreditation Renewal Requirements', date: 'Oct 12, 2026', urgent: true, read: true },
+    { id: 'MSG-001', type: 'Incoming', sender: 'Ministry of Education', subject: 'Updated Curriculum Guidelines for 2026/2027 Academic Year', date: 'Today, 10:45 AM', urgent: true, read: false, folder: 'Incoming' },
+    { id: 'MSG-002', type: 'Outgoing', sender: 'Vice Chancellor Office', subject: 'Invitation to Annual Research Symposium', date: 'Yesterday', urgent: false, read: true, folder: 'Outgoing' },
+    { id: 'MSG-003', type: 'Internal', sender: 'Registrar', subject: 'Notice of Academic Board Meeting', date: 'Oct 15, 2026', urgent: false, read: true, folder: 'Internal' },
+    { id: 'MSG-004', type: 'Incoming', sender: 'Ghana Tertiary Education Commission', subject: 'Accreditation Renewal Requirements', date: 'Oct 12, 2026', urgent: true, read: true, folder: 'Incoming' },
   ];
+
+  const filteredMessages = messagesData.filter(msg => {
+    const matchesSearch = msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      msg.id.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesFolder = activeFolder === 'All' || msg.folder === activeFolder;
+    
+    return matchesSearch && matchesFolder;
+  });
 
   return (
     <div className="space-y-6 animate-fade h-full flex flex-col pt-2 pb-6">
@@ -17,33 +34,50 @@ export default function Correspondence() {
           <p className="text-sm text-gray-500 mt-1">Track internal memos and external communications.</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors shadow-sm font-medium text-sm flex items-center">
-            <Mail size={16} className="mr-2 text-gray-400" /> Inbox
-            <span className="ml-2 bg-red-100 text-red-700 py-0.5 px-2 rounded-full text-xs font-bold">4</span>
+          <button 
+            onClick={() => setActiveFolder('Incoming')}
+            className={`px-4 py-2 border rounded-xl transition-colors shadow-sm font-medium text-sm flex items-center ${activeFolder === 'Incoming' ? 'bg-ucc-blue/10 border-ucc-blue text-ucc-blue' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+          >
+            <Mail size={16} className={`mr-2 ${activeFolder === 'Incoming' ? 'text-ucc-blue' : 'text-gray-400'}`} /> Inbox
+            <span className="ml-2 bg-red-100 text-red-700 py-0.5 px-2 rounded-full text-xs font-bold">2</span>
           </button>
-          <button className="px-4 py-2 bg-ucc-blue hover:bg-ucc-blue/90 text-white rounded-xl shadow-lg shadow-ucc-blue/20 transition-all hover:-translate-y-0.5 font-medium text-sm flex items-center">
-            <span className="mr-2 text-lg leading-none">+</span> Compose Memos
-          </button>
+          {user?.role !== 'Viewer' && (
+            <button 
+              onClick={() => setShowComposeModal(true)}
+              className="px-4 py-2 bg-ucc-blue hover:bg-black text-white rounded-xl shadow-lg shadow-ucc-blue/20 transition-all hover:-translate-y-0.5 font-medium text-sm flex items-center"
+            >
+              <span className="mr-2 text-lg leading-none">+</span> Compose Memos
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-6 xl:gap-8 flex-1 min-h-0">
         
         {/* Sidebar Nav */}
-        <div className="hidden lg:flex flex-col gap-2">
+        <div className="hidden lg:flex flex-col gap-2 xl:col-span-1">
           <div className="glass-card p-4 flex flex-col gap-1">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Mailboxes</h3>
             
-            <button className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-ucc-blue bg-ucc-blue/10 transition-colors text-left">
+            <button 
+              onClick={() => setActiveFolder('Incoming')}
+              className={`flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors text-left ${activeFolder === 'Incoming' ? 'text-ucc-blue bg-ucc-blue/10' : 'text-gray-700 hover:bg-gray-50'}`}
+            >
               <span className="flex items-center"><ArrowDownLeft size={16} className="mr-2" /> Incoming (Registry)</span>
-              <span className="bg-ucc-blue text-white text-xs py-0.5 px-2 rounded-full font-bold">12</span>
+              <span className={`text-xs py-0.5 px-2 rounded-full font-bold ${activeFolder === 'Incoming' ? 'bg-ucc-blue text-white' : 'bg-gray-100 text-gray-500'}`}>12</span>
             </button>
-            <button className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => setActiveFolder('Outgoing')}
+              className={`flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors text-left ${activeFolder === 'Outgoing' ? 'text-ucc-blue bg-ucc-blue/10' : 'text-gray-700 hover:bg-gray-50'}`}
+            >
               <span className="flex items-center"><ArrowUpRight size={16} className="mr-2 opacity-60" /> Outgoing</span>
             </button>
-            <button className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => setActiveFolder('Internal')}
+              className={`flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors text-left ${activeFolder === 'Internal' ? 'text-ucc-blue bg-ucc-blue/10' : 'text-gray-700 hover:bg-gray-50'}`}
+            >
               <span className="flex items-center"><Mail size={16} className="mr-2 opacity-60" /> Internal Memos</span>
-              <span className="bg-gray-200 text-gray-700 text-xs py-0.5 px-2 rounded-full font-bold">5</span>
+              <span className={`text-xs py-0.5 px-2 rounded-full font-bold ${activeFolder === 'Internal' ? 'bg-ucc-blue text-white' : 'bg-gray-100 text-gray-500'}`}>5</span>
             </button>
             
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-6 mb-2 px-2">Folders</h3>
@@ -76,6 +110,8 @@ export default function Correspondence() {
               <input 
                 type="text" 
                 placeholder="Search correspondence..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-ucc-blue/20 outline-none transition-all"
               />
             </div>
@@ -84,7 +120,7 @@ export default function Correspondence() {
           {/* List */}
           <div className="overflow-y-auto flex-1 bg-white/50">
             <ul className="divide-y divide-gray-100">
-              {messagesData.map((msg, idx) => (
+              {filteredMessages.map((msg, idx) => (
                 <li key={idx} className={`p-4 hover:bg-white transition-colors cursor-pointer group flex gap-4 ${!msg.read ? 'bg-blue-50/30' : ''}`}>
                   
                   <div className="flex-shrink-0 pt-1">
@@ -137,6 +173,97 @@ export default function Correspondence() {
           </div>
         </div>
       </div>
+      {/* Compose Memo Modal */}
+      {showComposeModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ucc-blue/20 backdrop-blur-xl animate-fade-in">
+          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-up border border-white/50">
+            {/* Modal Header */}
+            <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <div>
+                <h2 className="text-3xl font-black text-gray-900 tracking-tighter">Compose <span className="text-ucc-blue">Institutional Memo</span></h2>
+                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Official University Communication</p>
+              </div>
+              <button 
+                onClick={() => setShowComposeModal(false)}
+                className="p-3 hover:bg-gray-100 rounded-2xl transition-all group"
+              >
+                <X size={24} className="group-hover:rotate-90 transition-transform duration-500" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+              <form className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Memo Subject</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. NOTICE OF ACADEMIC BOARD MEETING - OCTOBER 2026"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 focus:bg-white focus:border-ucc-blue/30 outline-none text-sm font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Distribution Classification</label>
+                    <select className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 focus:bg-white focus:border-ucc-blue/30 outline-none text-sm font-bold appearance-none cursor-pointer">
+                      <option>Internal Memo (Departmental)</option>
+                      <option>Academic Board Circular</option>
+                      <option>Executive Directive (VC Office)</option>
+                      <option>General Staff Notice</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Priority Level</label>
+                    <select className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 px-6 focus:bg-white focus:border-ucc-blue/30 outline-none text-sm font-bold appearance-none cursor-pointer text-red-600">
+                      <option value="Normal">Normal Distribution</option>
+                      <option value="Urgent">Urgent Action Required</option>
+                      <option value="Confidential">Confidential / Restricted</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Recipients (Units / Personnel)</label>
+                    <div className="relative group/recipients">
+                      <User className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/recipients:text-ucc-blue" size={18} />
+                      <input 
+                        type="text" 
+                        placeholder="Search for departments, deans, or staff names..."
+                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-14 pr-6 focus:bg-white focus:border-ucc-blue/30 outline-none text-sm font-bold"
+                      />
+                    </div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Memo Content</label>
+                    <textarea 
+                      rows={6}
+                      placeholder="Type the official content of the memo here..."
+                      className="w-full bg-gray-50 border border-gray-200 rounded-[2rem] py-6 px-8 focus:bg-white focus:border-ucc-blue/30 outline-none text-sm font-medium leading-relaxed"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div className="p-8 border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50/50 flex flex-col items-center justify-center text-center hover:bg-white hover:border-ucc-blue/30 transition-all cursor-pointer">
+                  <Paperclip size={32} className="text-ucc-blue mb-4" />
+                  <p className="text-xs font-black text-gray-900 uppercase tracking-widest">Attach Digital Evidence / Documents</p>
+                  <p className="text-[10px] text-gray-400 mt-2 font-medium">Drag and drop PDFs, Scans, or Circulars (Max 50MB)</p>
+                </div>
+              </form>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-8 border-t border-gray-100 bg-gray-50 flex justify-end gap-4">
+              <button 
+                onClick={() => setShowComposeModal(false)}
+                className="px-8 py-3.5 border border-gray-200 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-gray-900 transition-all rounded-2xl"
+              >
+                Save as Draft
+              </button>
+              <button className="px-10 py-3.5 bg-ucc-blue text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-black shadow-xl shadow-ucc-blue/20 transition-all flex items-center gap-3">
+                Dispatch Memo <Send size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

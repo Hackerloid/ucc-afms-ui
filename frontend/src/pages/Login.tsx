@@ -1,32 +1,33 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FileText, Lock, Mail, Eye, EyeOff } from 'lucide-react';
-import { useAuth, type UserRole } from '../context/AuthContext';
+import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // Added isLoading state
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     
-    // Simple role determination based on email for the demo
-    // In a real app, this would be returned by the auth API
-    const determinedRole: UserRole = email.includes('admin') ? 'Super Admin' : 
-                                   email.includes('head') ? 'Department Head' : 
-                                   email.includes('view') ? 'Viewer' : 'Records Clerk';
-
-    // Simulate API call
+    // Simulate network latency
     setTimeout(() => {
+      const success = login(email, password);
       setIsLoading(false);
-      login(determinedRole);
-      navigate('/dashboard');
-    }, 1500);
+      
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setError('Invalid institutional credentials. Please check your email and password.');
+      }
+    }, 1200);
   };
 
   return (
@@ -35,14 +36,21 @@ export default function Login() {
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ucc-blue via-ucc-red to-ucc-gold"></div>
       
       <div className="flex flex-col items-center justify-center space-y-4 mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-ucc-blue to-ucc-blue/80 flex items-center justify-center text-white shadow-lg animate-slide-up">
-          <FileText size={32} />
+        <div className="w-24 h-24 rounded-2xl bg-white flex items-center justify-center shadow-premium animate-slide-up group overflow-hidden border-2 border-ucc-blue/5">
+          <img src="/ucc-logo.png" alt="UCC Logo" className="w-20 h-20 object-contain group-hover:scale-110 transition-transform duration-500" />
         </div>
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight animate-slide-up" style={{ animationDelay: '100ms' }}>UCC DMS</h1>
-          <p className="text-sm text-gray-500 mt-1 animate-slide-up" style={{ animationDelay: '150ms' }}>Document Management System</p>
+          <h1 className="text-3xl font-black text-[#001f3f] tracking-tighter animate-slide-up" style={{ animationDelay: '100ms' }}>UNIVERSITY <span className="text-ucc-blue">DMS</span></h1>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] animate-slide-up" style={{ animationDelay: '150ms' }}>Document Management System</p>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 animate-shake">
+          <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+          <p className="text-[11px] font-bold uppercase tracking-tight">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleLogin} className="space-y-6">
         <div className="space-y-4">

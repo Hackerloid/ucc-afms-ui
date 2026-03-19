@@ -11,7 +11,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (role: UserRole) => void;
+  login: (email: string, password: string) => boolean;
   logout: () => void;
   isAuthenticated: boolean;
   hasPermission: (permission: string) => boolean;
@@ -30,23 +30,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (role: UserRole) => {
-    // Mock user generation based on role
-    const mockUser: User = {
-      name: role === 'Super Admin' ? 'Dr. Regina Gyampoh-Vidogah' : 
-            role === 'Department Head' ? 'Prof. David Teye Doku' :
-            role === 'Records Clerk' ? 'Akwasi Appiah' : 'Kofi Annan',
-      email: role === 'Super Admin' ? 'rgyampoh@ucc.edu.gh' : 
-             role === 'Department Head' ? 'ddoku@ucc.edu.gh' :
-             role === 'Records Clerk' ? 'aappiah@ucc.edu.gh' : 'kannan@ucc.edu.gh',
-      role,
-      department: role === 'Super Admin' ? 'Directorate of ICT Services (DICTS)' : 
-                  role === 'Department Head' ? 'Directorate of Research, Innovation and Consultancy (DRIC)' :
-                  role === 'Records Clerk' ? 'Records Office' : 'General Administration Division',
+  const login = (email: string, password: string): boolean => {
+    // Hardcoded test users
+    const testUsers: Record<string, { password: string, name: string, role: UserRole, department: string }> = {
+      'admin@ucc.edu.gh': { password: 'uccAdmin2026', name: 'Dr. Regina Gyampoh-Vidogah', role: 'Super Admin', department: 'Directorate of ICT Services (DICTS)' },
+      'head@ucc.edu.gh': { password: 'uccHead2026', name: 'Prof. David Teye Doku', role: 'Department Head', department: 'Directorate of Research, Innovation and Consultancy (DRIC)' },
+      'clerk@ucc.edu.gh': { password: 'uccClerk2026', name: 'Akwasi Appiah', role: 'Records Clerk', department: 'Records Office' },
+      'viewer@ucc.edu.gh': { password: 'uccView2026', name: 'Kofi Annan', role: 'Viewer', department: 'General Administration Division' },
     };
+
+    const foundUser = testUsers[email];
+    if (foundUser && foundUser.password === password) {
+      const authUser: User = {
+        name: foundUser.name,
+        email: email,
+        role: foundUser.role,
+        department: foundUser.department,
+      };
+      setUser(authUser);
+      localStorage.setItem('dms_user', JSON.stringify(authUser));
+      return true;
+    }
     
-    setUser(mockUser);
-    localStorage.setItem('dms_user', JSON.stringify(mockUser));
+    return false;
   };
 
   const logout = () => {

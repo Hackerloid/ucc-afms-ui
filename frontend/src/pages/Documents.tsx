@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   FileText, 
   Search, 
@@ -17,6 +18,7 @@ import {
   Layers
 } from 'lucide-react';
 import { UCC_DEPARTMENTS } from '../constants/departments';
+import { useAuth } from '../context/AuthContext';
 
 interface Document {
   id: string;
@@ -32,8 +34,21 @@ interface Document {
 }
 
 export default function Documents() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showBatchModal, setShowBatchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      setShowRegisterModal(true);
+      // Clear the param after opening to avoid re-opening on refresh if not intended, 
+      // but usually keeping it is fine. Let's clear it for a better UX.
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('new');
+      setSearchParams(newParams);
+    }
+  }, [searchParams, setSearchParams]);
 
   const documentsData: Document[] = [
     { 
@@ -86,6 +101,13 @@ export default function Documents() {
     },
   ];
 
+  const filteredDocuments = documentsData.filter(doc => 
+    doc.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    doc.refNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    doc.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    doc.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'Immediate': return 'bg-red-100 text-red-700 border-red-200';
@@ -104,245 +126,352 @@ export default function Documents() {
     }
   };
 
+  const { user } = useAuth();
+
   return (
-    <div className="space-y-6 animate-fade pb-10">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Documents Explorer</h1>
-          <p className="text-sm text-gray-500 mt-1">Central repository for all institutional letters, memos, and reports.</p>
+    <div className="space-y-8 animate-fade-in p-2 pb-20">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="animate-slide-up">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2 py-1 rounded bg-ucc-blue/5 text-ucc-blue text-[10px] font-black uppercase tracking-widest border border-ucc-blue/10">Institutional Repository</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-ucc-blue"></span>
+          </div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tighter leading-none">
+            Documents <span className="text-ucc-blue">Explorer</span>
+          </h1>
+          <p className="text-sm text-gray-500 mt-3 font-medium max-w-xl leading-relaxed">
+            Access and manage the centralized repository of all institutional correspondence, internal memos, and academic reports.
+          </p>
         </div>
-        <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm transition-all font-medium text-sm flex items-center">
-            <Layers size={18} className="mr-2 text-gray-400" /> Batch Actions
-          </button>
-          <button 
-            onClick={() => setShowRegisterModal(true)}
-            className="px-4 py-2 bg-ucc-blue hover:bg-ucc-blue/90 text-white rounded-xl shadow-lg shadow-ucc-blue/20 transition-all hover:-translate-y-0.5 font-medium text-sm flex items-center"
-          >
-            <Plus size={18} className="mr-2" /> Register Document
-          </button>
-        </div>
+        
+        {user?.role !== 'Viewer' && (
+          <div className="flex gap-3 animate-slide-up" style={{ animationDelay: '100ms' }}>
+            <button 
+              onClick={() => setShowBatchModal(true)}
+              className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-2xl hover:bg-gray-50 transition-all shadow-sm font-bold text-xs uppercase tracking-widest hover:shadow-md flex items-center gap-2"
+            >
+              <Layers size={16} className="text-gray-400" /> Batch Actions
+            </button>
+            <button 
+              onClick={() => setShowRegisterModal(true)}
+              className="px-6 py-2.5 bg-ucc-blue hover:bg-black text-white rounded-2xl shadow-xl shadow-ucc-blue/20 transition-all hover:-translate-y-1 font-bold text-xs uppercase tracking-widest flex items-center gap-2"
+            >
+              <Plus size={16} /> Register Document
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Stats Quick View */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
         {[
-          { label: 'All Documents', count: '1,248', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Pending Review', count: '42', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Recently Approved', count: '156', icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Urgent Action', count: '8', icon: AlertCircle, color: 'text-red-600', bg: 'bg-red-50' },
+          { label: 'Total Archives', count: '1,248', icon: FileText, color: 'text-ucc-blue', bg: 'bg-ucc-blue/5', border: 'border-ucc-blue/10' },
+          { label: 'Pending Review', count: '42', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
+          { label: 'Recently Finalized', count: '156', icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-100' },
+          { label: 'Urgent Action', count: '08', icon: AlertCircle, color: 'text-ucc-red', bg: 'bg-ucc-red/5', border: 'border-ucc-red/10' },
         ].map((stat, i) => (
-          <div key={i} className="glass-card p-4 flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center`}>
-              <stat.icon size={24} />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{stat.label}</p>
-              <p className="text-xl font-bold text-gray-900">{stat.count}</p>
+          <div key={i} className={`glass-card p-5 group hover:scale-[1.02] transition-all border-t-2`} style={{ borderTopColor: stat.color.startsWith('text-ucc') ? '#003366' : (stat.color.includes('amber') ? '#F2A900' : (stat.color.includes('green') ? '#10B981' : '#C8102E')) }}>
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500`}>
+                <stat.icon size={22} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
+                <p className="text-2xl font-black text-gray-900 tracking-tight">{stat.count}</p>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Main Content Area */}
-      <div className="glass-card overflow-hidden">
-        {/* Toolbar */}
-        <div className="p-4 border-b border-gray-100 flex flex-col md:flex-row justify-between gap-4 bg-white/50">
-          <div className="relative flex-1 max-w-md">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-              <Search size={16} />
-            </span>
-            <input 
-              type="text" 
-              placeholder="Search by subject, reference no, or tags..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-ucc-blue/20 outline-none transition-shadow"
-            />
+      {/* Documents Table Interface */}
+      <div className="space-y-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
+        <div className="glass-panel group">
+          {/* Toolbar */}
+          <div className="px-8 py-5 border-b border-gray-100 flex flex-col md:flex-row justify-between gap-6 bg-gray-50/30">
+            <div className="relative flex-1 group/search">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/search:text-ucc-blue transition-colors" size={18} />
+              <input 
+                type="text" 
+                placeholder="Search repository by subject, reference no, or tags..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white/50 border border-gray-200/50 rounded-xl py-2.5 pl-12 pr-4 focus:bg-white focus:border-ucc-blue/30 focus:ring-4 focus:ring-ucc-blue/5 transition-all outline-none text-sm font-medium"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-gray-50 hover:border-ucc-blue/20 transition-all flex items-center gap-2">
+                <Filter size={14} /> Advanced Filters
+              </button>
+              <select className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-600 outline-none focus:border-ucc-blue/20 cursor-pointer">
+                <option>Newest First</option>
+                <option>Oldest First</option>
+                <option>Priority: High</option>
+              </select>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <button className="px-3 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 flex items-center">
-              <Filter size={16} className="mr-2" /> Filters
-            </button>
-            <select className="px-3 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 bg-white outline-none">
-              <option>Sort by: Newest First</option>
-              <option>Sort by: Priority</option>
-              <option>Sort by: Reference No</option>
-            </select>
-          </div>
-        </div>
 
-        {/* Desktop Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-50/50 border-b border-gray-100">
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Document Details</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Type / Dept</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Priority</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 bg-white/30">
-              {documentsData.map((doc) => (
-                <tr key={doc.id} className="hover:bg-white/60 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-ucc-blue/5 group-hover:text-ucc-blue transition-colors">
-                        <FileText size={20} />
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold text-gray-900 group-hover:text-ucc-blue transition-colors line-clamp-1">{doc.subject}</div>
-                        <div className="text-xs font-mono text-gray-500 mt-0.5">{doc.refNo}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="text-gray-900 font-medium">{doc.type}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">{doc.department}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-[11px] font-bold border uppercase tracking-tighter ${getPriorityColor(doc.priority)}`}>
-                      {doc.priority}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(doc.status)}
-                      <span className="text-sm font-medium text-gray-700">{doc.status}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(doc.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button title="View" className="p-2 text-gray-400 hover:text-ucc-blue hover:bg-ucc-blue/5 rounded-lg transition-colors"><Eye size={16} /></button>
-                      <button title="Download" className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"><Download size={16} /></button>
-                      <button title="History" className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"><History size={16} /></button>
-                      <button className="p-2 text-gray-400 hover:text-gray-900 rounded-lg"><MoreVertical size={16} /></button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50/50 border-b border-gray-100">
+                  <th className="px-8 py-5 font-black text-[10px] text-gray-400 uppercase tracking-widest">Document Entity</th>
+                  <th className="px-6 py-5 font-black text-[10px] text-gray-400 uppercase tracking-widest">Classification / Unit</th>
+                  <th className="px-6 py-5 font-black text-[10px] text-gray-400 uppercase tracking-widest">Urgency</th>
+                  <th className="px-6 py-5 font-black text-[10px] text-gray-400 uppercase tracking-widest">Status</th>
+                  <th className="px-6 py-5 text-right font-black text-[10px] text-gray-400 uppercase tracking-widest">Management</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredDocuments.map((doc) => (
+                  <tr key={doc.id} className="hover:bg-white transition-all group/row cursor-pointer">
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover/row:scale-110 group-hover/row:bg-ucc-blue/5 group-hover/row:text-ucc-blue transition-all duration-500 shadow-sm">
+                          <FileText size={20} />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-gray-900 truncate tracking-tight group-hover/row:text-ucc-blue transition-colors">{doc.subject}</div>
+                          <div className="text-[10px] text-gray-400 mt-1 font-bold uppercase tracking-wider">{doc.refNo}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="text-xs font-black text-gray-700">{doc.type}</div>
+                      <div className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tight">{doc.department}</div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border-2 ${getPriorityColor(doc.priority)}`}>
+                        {doc.priority}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(doc.status)}
+                        <span className="text-[10px] font-black text-gray-700 uppercase tracking-tight">{doc.status}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover/row:opacity-100 transition-all transform translate-x-2 group-hover/row:translate-x-0">
+                        <button title="View digital original" className="p-2 text-gray-400 hover:text-ucc-blue hover:bg-ucc-blue/5 rounded-xl transition-all"><Eye size={18} /></button>
+                        <button title="Export record" className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"><Download size={18} /></button>
+                        <button title="Audit history" className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"><History size={18} /></button>
+                        <button className="p-2 text-gray-400 hover:text-gray-900 rounded-xl"><MoreVertical size={18} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        {/* Pagination */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50/30 flex items-center justify-between">
-          <p className="text-sm text-gray-500">Showing <span className="font-bold text-gray-900">1-4</span> of <span className="font-bold text-gray-900">1,248</span> documents</p>
-          <div className="flex gap-2">
-            <button disabled className="px-3 py-1 border border-gray-200 rounded text-sm text-gray-400 bg-gray-100 cursor-not-allowed">Previous</button>
-            <button className="px-3 py-1 border border-gray-200 rounded text-sm text-gray-700 hover:bg-white transition-colors">Next</button>
+          <div className="px-8 py-5 border-t border-gray-100 bg-gray-50/30 flex items-center justify-between">
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Reflecting <span className="text-gray-900">4</span> of <span className="text-gray-900 text-ucc-blue">1,248</span> repository entries</p>
+            <div className="flex gap-2">
+              <button disabled className="px-4 py-1.5 border border-gray-200 rounded-lg text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100/50 cursor-not-allowed">Prior Repository</button>
+              <button className="px-4 py-1.5 border border-gray-200 rounded-lg text-[10px] font-black text-gray-700 uppercase tracking-widest hover:bg-white hover:border-ucc-blue/20 transition-all">Next Entries</button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Registration Modal Overlay */}
       {showRegisterModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-up">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-ucc-blue text-white">
-              <div>
-                <h2 className="text-xl font-bold">Register New Document</h2>
-                <p className="text-xs text-blue-100 mt-1 uppercase tracking-widest font-semibold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Ref No: [AUTO-GENERATED]
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ucc-blue/20 backdrop-blur-xl animate-fade-in">
+          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-up border border-white/50">
+            {/* Modal Header */}
+            <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-ucc-blue to-ucc-blue-dark text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-white/10 rounded-full blur-3xl"></div>
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 rounded bg-white/20 text-white text-[9px] font-black uppercase tracking-widest backdrop-blur-md">Institutional Process</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-ucc-gold animate-pulse"></span>
+                </div>
+                <h2 className="text-3xl font-black tracking-tighter">Digital Record <span className="text-ucc-gold">Entry</span></h2>
+                <p className="text-[10px] text-blue-100 mt-2 font-black uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
+                  Reference No: <span className="bg-white/10 px-2 py-0.5 rounded">UCC-REG-2026-VOID</span>
                 </p>
               </div>
               <button 
                 onClick={() => setShowRegisterModal(false)}
-                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all group relative z-10"
               >
-                <X size={20} />
+                <X size={24} className="group-hover:rotate-90 transition-transform duration-500" />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto flex-1">
-              <form className="space-y-6">
-                {/* Basic Metadata */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Subject / Title FR-303</label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter the main subject of the document"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-ucc-blue/20 focus:border-ucc-blue transition-all"
-                    />
+            {/* Modal Body */}
+            <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+              <form className="space-y-10">
+                {/* Form Group: Identity */}
+                <div className="space-y-6">
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.25em] flex items-center gap-3">
+                    <span className="w-8 h-px bg-gray-200"></span> 01. Metadata Identity
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
+                    <div className="md:col-span-2">
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Document Subject / Title</label>
+                      <input 
+                        type="text" 
+                        placeholder="Enter the official subject title as written on the document..."
+                        className="w-full bg-gray-50 border border-gray-200 rounded-[1.25rem] py-4 px-6 focus:bg-white focus:border-ucc-blue/30 focus:ring-8 focus:ring-ucc-blue/5 transition-all outline-none text-sm font-bold placeholder:font-medium placeholder:text-gray-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Classification Type</label>
+                      <select className="w-full bg-gray-50 border border-gray-200 rounded-[1.25rem] py-4 px-6 focus:bg-white focus:border-ucc-blue/30 transition-all outline-none text-sm font-bold appearance-none cursor-pointer">
+                        <option>Internal Memo</option>
+                        <option>Incoming Correspondence</option>
+                        <option>Outgoing Correspondence</option>
+                        <option>Academic Circular</option>
+                        <option>Administrative Report</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Priority Classification</label>
+                      <select className="w-full bg-gray-50 border border-gray-200 rounded-[1.25rem] py-4 px-6 focus:bg-white focus:border-ucc-blue/30 transition-all outline-none text-sm font-bold appearance-none cursor-pointer">
+                        <option>Standard Distribution</option>
+                        <option>Urgent Processing</option>
+                        <option>Confidential Handling</option>
+                        <option>Immediate Executive Action</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Originating University Unit</label>
+                      <select className="w-full bg-gray-50 border border-gray-200 rounded-[1.25rem] py-4 px-6 focus:bg-white focus:border-ucc-blue/30 transition-all outline-none text-sm font-bold appearance-none cursor-pointer">
+                        {UCC_DEPARTMENTS.slice(0, 15).map(dept => (
+                          <option key={dept.id} value={dept.name}>{dept.name}</option>
+                        ))}
+                        <option>Other / External Entity</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Originating Officer / Entity</label>
+                      <input 
+                        type="text" 
+                        placeholder="Name of Dean, Director, or External Entity"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-[1.25rem] py-4 px-6 focus:bg-white focus:border-ucc-blue/30 transition-all outline-none text-sm font-bold placeholder:font-medium placeholder:text-gray-300"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Document Type</label>
-                    <select className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-ucc-blue/20 focus:border-ucc-blue transition-all">
-                      <option>Internal Memo</option>
-                      <option>Incoming Letter</option>
-                      <option>Outgoing Letter</option>
-                      <option>Circular</option>
-                      <option>Report</option>
-                    </select>
+                </div>
+
+                {/* Form Group: Assets */}
+                <div className="space-y-6">
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.25em] flex items-center gap-3">
+                    <span className="w-8 h-px bg-gray-200"></span> 02. Digital Assets
+                  </h3>
+                  <div className="px-2">
+                    <div className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-ucc-blue/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
+                      <div className="p-12 border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50/50 flex flex-col items-center justify-center text-center group-hover:border-ucc-blue/30 group-hover:bg-white transition-all cursor-pointer relative z-10">
+                        <div className="w-20 h-20 rounded-[2rem] bg-white shadow-xl flex items-center justify-center text-ucc-blue mb-6 group-hover:scale-110 group-hover:translate-y-[-10px] transition-all duration-500">
+                          <Upload size={36} strokeWidth={1.5} />
+                        </div>
+                        <h4 className="text-xl font-black text-gray-900 tracking-tight">Institutional Document Scan</h4>
+                        <p className="text-sm text-gray-400 mt-2 font-medium">Capture or drag PDF, DOCX, or high-res images here</p>
+                        <div className="mt-8 flex gap-4">
+                          <span className="px-3 py-1 bg-white rounded-lg border border-gray-100 text-[9px] font-black text-gray-400 uppercase tracking-widest">Max 25MB</span>
+                          <span className="px-3 py-1 bg-ucc-blue/5 rounded-lg border border-ucc-blue/10 text-[9px] font-black text-ucc-blue uppercase tracking-widest flex items-center gap-1">
+                            <CheckCircle2 size={10} /> OCR Enabled Indexing
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Priority Level</label>
-                    <select className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-ucc-blue/20 focus:border-ucc-blue transition-all">
-                      <option>Normal</option>
-                      <option>Urgent</option>
-                      <option>Confidential</option>
-                      <option>Immediate</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Originating Department</label>
-                    <select className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-ucc-blue/20 focus:border-ucc-blue transition-all">
-                      {UCC_DEPARTMENTS.map(dept => (
-                        <option key={dept.id} value={dept.name}>{dept.name}</option>
+                </div>
+
+                {/* Form Group: Taxonomy */}
+                <div className="space-y-6">
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.25em] flex items-center gap-3">
+                    <span className="w-8 h-px bg-gray-200"></span> 03. Search Taxonomy
+                  </h3>
+                  <div className="px-2">
+                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Archival Tags & Keywords</label>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {['Budget-2026', 'Academic-Board', 'VC-Directive'].map((tag) => (
+                        <span key={tag} className="px-3 py-1.5 bg-ucc-blue/5 text-ucc-blue text-[10px] font-black uppercase tracking-widest rounded-xl border border-ucc-blue/10 flex items-center gap-2">
+                          {tag} <X size={12} className="cursor-pointer hover:scale-125 transition-transform" />
+                        </span>
                       ))}
-                    </select>
+                      <input 
+                        type="text" 
+                        placeholder="Add tag..."
+                        className="bg-transparent border-none outline-none text-xs font-bold text-gray-900 placeholder:text-gray-300 w-24"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Sender Name/Entity</label>
-                    <input 
-                      type="text" 
-                      placeholder="Internal staff or External entity"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-ucc-blue/20 transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* File Upload Section FR-304 & FR-307 */}
-                <div className="p-8 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50 flex flex-col items-center justify-center text-center group hover:border-ucc-blue/30 transition-colors cursor-pointer">
-                  <div className="w-16 h-16 rounded-full bg-ucc-blue/5 flex items-center justify-center text-ucc-blue mb-4 group-hover:scale-110 transition-transform">
-                    <Upload size={32} />
-                  </div>
-                  <h3 className="font-bold text-gray-900">Click to upload or drag and drop</h3>
-                  <p className="text-sm text-gray-500 mt-1">PDF, DOCX, PNG or JPG (Max 10MB)</p>
-                  <p className="text-xs text-amber-600 mt-3 font-medium flex items-center">
-                    <Paperclip size={12} className="mr-1" /> FR-307: Supports automatic OCR indexing
-                  </p>
-                </div>
-
-                {/* Tags FR-303 */}
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Tags / Keywords (Comma separated)</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Budget, Academic, MoE"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-ucc-blue/20 transition-all"
-                  />
                 </div>
               </form>
             </div>
 
-            <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+            {/* Modal Footer */}
+            <div className="p-8 border-t border-gray-100 bg-gray-50 flex justify-end gap-4">
               <button 
                 onClick={() => setShowRegisterModal(false)}
-                className="px-6 py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-white transition-all font-medium"
+                className="px-8 py-3.5 border border-gray-200 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-gray-900 hover:bg-white hover:border-gray-300 transition-all rounded-2xl"
               >
-                Cancel
+                Cancel Entry
               </button>
-              <button className="px-6 py-2 bg-ucc-blue text-white rounded-xl hover:bg-ucc-blue/90 shadow-lg shadow-ucc-blue/20 transition-all font-bold">
-                Register Document
+              <button className="px-10 py-3.5 bg-ucc-blue text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-black shadow-xl shadow-ucc-blue/20 transition-all hover:translate-y-[-2px] active:translate-y-0">
+                Finalize & Archive Record
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Batch Actions Modal */}
+      {showBatchModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ucc-blue/20 backdrop-blur-xl animate-fade-in">
+          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl animate-slide-up border border-white/50 overflow-hidden">
+            <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <div>
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Batch Operations</h2>
+                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Select multiple records to process</p>
+              </div>
+              <button 
+                onClick={() => setShowBatchModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-all"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <button className="p-6 border border-gray-100 rounded-2xl hover:border-ucc-blue/30 hover:bg-ucc-blue/5 transition-all flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <Download size={24} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Bulk Download</span>
+                </button>
+                <button className="p-6 border border-gray-100 rounded-2xl hover:border-green-600/30 hover:bg-green-50 transition-all flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Mark as Archived</span>
+                </button>
+                <button className="p-6 border border-gray-100 rounded-2xl hover:border-amber-600/30 hover:bg-amber-50 transition-all flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <Paperclip size={24} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Attach to Workflow</span>
+                </button>
+                <button className="p-6 border border-gray-100 rounded-2xl hover:border-red-600/30 hover:bg-red-50 transition-all flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                    <AlertCircle size={24} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Flag for Review</span>
+                </button>
+              </div>
+              <p className="text-center text-[10px] text-gray-400 font-medium">Please select documents from the repository grid first to enable batch processing.</p>
+            </div>
+            <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
+              <button 
+                onClick={() => setShowBatchModal(false)}
+                className="px-6 py-2.5 bg-ucc-blue text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all"
+              >
+                Close Toolbar
               </button>
             </div>
           </div>
