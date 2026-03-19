@@ -22,8 +22,16 @@ import { useAuth } from './context/AuthContext';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, feature }: { children: React.ReactNode, feature?: string }) => {
-  const { isAuthenticated, hasPermission } = useAuth();
+  const { isAuthenticated, hasPermission, loading } = useAuth();
   
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-ucc-blue/5 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-ucc-blue/20 border-t-ucc-blue rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }

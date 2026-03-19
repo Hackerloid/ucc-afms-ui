@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { 
   BarChart2, 
+  BarChart3,
+  FileCheck,
   FileText, 
   Download, 
   Eye, 
@@ -9,8 +11,12 @@ import {
   Plus, 
   Search, 
   CheckCircle2, 
+  Shield,
   Clock, 
-  Filter 
+  Filter,
+  X,
+  Users,
+  MoreVertical
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 

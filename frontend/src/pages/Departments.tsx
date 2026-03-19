@@ -1,5 +1,18 @@
 import { useState } from 'react';
-import { Plus, Search, Filter, Layers, Building2, MapPin, Users, ArrowRight, X } from 'lucide-react';
+import { 
+  Building2, 
+  Search, 
+  Plus, 
+  MapPin, 
+  MoreVertical, 
+  User as UserIcon, 
+  ArrowRight, 
+  X, 
+  Upload, 
+  Filter, 
+  Layers, 
+  Users 
+} from 'lucide-react';
 import { UCC_DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../context/AuthContext';
 

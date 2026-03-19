@@ -14,6 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => boolean;
   logout: () => void;
   isAuthenticated: boolean;
+  loading: boolean;
   hasPermission: (permission: string) => boolean;
 }
 
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -28,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+    setLoading(false);
   }, []);
 
   const login = (email: string, password: string): boolean => {
@@ -74,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, hasPermission }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, loading, hasPermission }}>
       {children}
     </AuthContext.Provider>
   );
