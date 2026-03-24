@@ -129,7 +129,10 @@ export default function Dashboard() {
         <div className="lg:col-span-2 xl:col-span-3 space-y-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
           <div className="flex items-center justify-between px-2">
             <h3 className="text-xl font-black text-gray-900 tracking-tight">Recent Archives</h3>
-            <button className="text-[10px] font-black text-ucc-blue hover:underline uppercase tracking-widest flex items-center gap-1 group">
+            <button 
+              onClick={() => navigate('/documents')}
+              className="text-[10px] font-black text-ucc-blue hover:underline uppercase tracking-widest flex items-center gap-1 group"
+            >
               View Repository <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -146,7 +149,11 @@ export default function Dashboard() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {recentDocuments.map((doc, idx) => (
-                    <tr key={idx} className="hover:bg-white transition-colors group/row cursor-pointer">
+                    <tr 
+                      key={idx} 
+                      onClick={() => navigate('/documents')}
+                      className="hover:bg-white transition-colors group/row cursor-pointer"
+                    >
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
                           <div className={`w-12 h-12 rounded-2xl ${doc.bgColor} rounded-xl flex items-center justify-center group-hover/row:scale-110 transition-transform duration-500 shadow-sm shadow-black/5`}>
@@ -197,24 +204,28 @@ export default function Dashboard() {
                 label="Registry" 
                 color="bg-blue-50 text-blue-600" 
                 hasPermission={hasPermission('documents')}
+                onClick={() => navigate('/documents')}
               />
               <QuickActionBtn 
                 icon={<Clock size={20} />} 
                 label="Approvals" 
                 color="bg-amber-50 text-amber-600" 
                 hasPermission={hasPermission('workflows')}
+                onClick={() => navigate('/workflows')}
               />
               <QuickActionBtn 
                 icon={<Users size={20} />} 
                 label="Directory" 
                 color="bg-green-50 text-green-600" 
                 hasPermission={hasPermission('users')}
+                onClick={() => navigate('/users')}
               />
               <QuickActionBtn 
                 icon={<Settings size={20} />} 
                 label="Support" 
                 color="bg-purple-50 text-purple-600" 
                 hasPermission={hasPermission('settings')}
+                onClick={() => navigate('/settings')}
               />
             </div>
           </div>
@@ -224,9 +235,9 @@ export default function Dashboard() {
             <h3 className="text-xl font-black text-gray-900 tracking-tight px-2">Institutional Memos</h3>
             <div className="glass-panel p-2">
               <ul className="space-y-1">
-                <MemoItem title="Review VC Annual Address" due="Action Required" priority="high" />
-                <MemoItem title="Digital Transition Workshop" due="Ongoing" priority="medium" />
-                <MemoItem title="Budget Planning Phase 2" due="Tomorrow" priority="medium" />
+                <MemoItem title="Review VC Annual Address" due="Action Required" priority="high" onClick={() => navigate('/correspondence')} />
+                <MemoItem title="Digital Transition Workshop" due="Ongoing" priority="medium" onClick={() => navigate('/correspondence')} />
+                <MemoItem title="Budget Planning Phase 2" due="Tomorrow" priority="medium" onClick={() => navigate('/correspondence')} />
               </ul>
               <button className="w-full mt-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-ucc-blue transition-colors border-t border-gray-100">
                 Open Integrated Calendar
@@ -241,10 +252,13 @@ export default function Dashboard() {
 }
 
 // Sub-components for cleaner Dashboard
-const QuickActionBtn = ({ icon, label, color, hasPermission }: any) => {
+const QuickActionBtn = ({ icon, label, color, hasPermission, onClick }: any) => {
   if (!hasPermission) return null;
   return (
-    <button className="glass-card flex flex-col items-center justify-center p-5 group hover:bg-white hover:border-ucc-blue/30 transition-all shadow-sm">
+    <button 
+      onClick={onClick}
+      className="glass-card flex flex-col items-center justify-center p-5 group hover:bg-white hover:border-ucc-blue/30 transition-all shadow-sm"
+    >
       <div className={`w-12 h-12 rounded-2xl ${color.split(' ')[0]} flex items-center justify-center ${color.split(' ')[1]} mb-3 group-hover:scale-110 group-hover:shadow-lg transition-all duration-500`}>
         {icon}
       </div>
@@ -253,8 +267,11 @@ const QuickActionBtn = ({ icon, label, color, hasPermission }: any) => {
   );
 };
 
-const MemoItem = ({ title, due, priority }: { title: string, due: string, priority: 'high' | 'medium' }) => (
-  <li className="p-4 hover:bg-gray-50/50 rounded-xl transition-all flex items-start gap-4 group cursor-pointer">
+const MemoItem = ({ title, due, priority, onClick }: { title: string, due: string, priority: 'high' | 'medium', onClick?: () => void }) => (
+  <li 
+    onClick={onClick}
+    className="p-4 hover:bg-gray-50/50 rounded-xl transition-all flex items-start gap-4 group cursor-pointer"
+  >
     <div className={`w-1.5 h-1.5 mt-1.5 rounded-full flex-shrink-0 ${priority === 'high' ? 'bg-ucc-red shadow-[0_0_10px_rgba(204,0,0,0.5)]' : 'bg-ucc-gold'}`}></div>
     <div className="flex-1 min-w-0">
       <p className="text-sm font-bold text-gray-900 truncate tracking-tight">{title}</p>

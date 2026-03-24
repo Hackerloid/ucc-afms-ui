@@ -225,7 +225,11 @@ export default function Documents() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredDocuments.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-white transition-all group/row cursor-pointer">
+                  <tr 
+                    key={doc.id} 
+                    onClick={() => {}} // Placeholder for opening document
+                    className="hover:bg-white transition-all group/row cursor-pointer"
+                  >
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover/row:scale-110 group-hover/row:bg-ucc-blue/5 group-hover/row:text-ucc-blue transition-all duration-500 shadow-sm">

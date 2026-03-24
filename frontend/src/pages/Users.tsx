@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Filter, Mail, Shield, MoreVertical, UserPlus, CheckCircle2, Clock, Users as UsersIcon } from 'lucide-react';
+import { Search, Mail, Shield, MoreVertical, UserPlus, Users as UsersIcon, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { UCC_DEPARTMENTS } from '../constants/departments';
 
@@ -99,7 +99,11 @@ export default function Users() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {filteredUsers.map((user, idx) => (
-                    <tr key={idx} className="hover:bg-white transition-all group/row cursor-pointer">
+                    <tr 
+                      key={idx} 
+                      onClick={() => {}} // Placeholder for user details
+                      className="hover:bg-white transition-all group/row cursor-pointer"
+                    >
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
                           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black group-hover/row:scale-110 transition-all duration-500 shadow-sm ${user.avatarColor}`}>

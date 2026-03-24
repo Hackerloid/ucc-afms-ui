@@ -82,14 +82,23 @@ export default function Correspondence() {
             
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-6 mb-2 px-2">Folders</h3>
             
-            <button className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-left"
+            >
               <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-red-400 mr-3"></span> Urgent</span>
             </button>
-            <button className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-left mt-1">
+            <button 
+              onClick={() => setSearchQuery('Academic')}
+              className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-left"
+            >
               <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-blue-400 mr-3"></span> Academic Affairs</span>
             </button>
-            <button className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-left mt-1">
-              <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-green-400 mr-3"></span> HR & Finance</span>
+            <button 
+              onClick={() => setSearchQuery('General')}
+              className="flex justify-between items-center w-full px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-left"
+            >
+              <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-ucc-gold mr-3"></span> General Inquiries</span>
             </button>
           </div>
         </div>
@@ -121,7 +130,11 @@ export default function Correspondence() {
           <div className="overflow-y-auto flex-1 bg-white/50">
             <ul className="divide-y divide-gray-100">
               {filteredMessages.map((msg, idx) => (
-                <li key={idx} className={`p-4 hover:bg-white transition-colors cursor-pointer group flex gap-4 ${!msg.read ? 'bg-blue-50/30' : ''}`}>
+                <li 
+                  key={idx} 
+                  onClick={() => {}} // Placeholder for opening message
+                  className={`p-4 hover:bg-white transition-colors cursor-pointer group flex gap-4 ${!msg.read ? 'bg-blue-50/30' : ''}`}
+                >
                   
                   <div className="flex-shrink-0 pt-1">
                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white ${

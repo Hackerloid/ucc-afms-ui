@@ -39,9 +39,12 @@ export default function TopHeader() {
                 </div>
               </div>
             </button>
-            <button className="p-2.5 text-gray-500 hover:text-ucc-blue hover:bg-ucc-blue/5 rounded-xl transition-all">
+            <Link 
+              to="/settings"
+              className="p-2.5 text-gray-500 hover:text-ucc-blue hover:bg-ucc-blue/5 rounded-xl transition-all"
+            >
               <User size={20} />
-            </button>
+            </Link>
           </div>
           
           <div className="flex items-center gap-4 pl-6 border-l border-gray-100">
@@ -52,12 +55,12 @@ export default function TopHeader() {
                 <p className="text-[10px] font-bold text-ucc-blue/60 uppercase tracking-widest">{user?.role}</p>
               </div>
             </div>
-            <div className="relative">
+            <Link to="/settings" className="relative">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-ucc-blue to-ucc-blue/80 flex items-center justify-center text-white shadow-lg shadow-ucc-blue/20 ring-2 ring-white overflow-hidden group cursor-pointer hover:scale-105 transition-transform">
                 <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <span className="text-sm font-bold">{user?.name?.split(' ').map(n => n[0]).join('')}</span>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </div>

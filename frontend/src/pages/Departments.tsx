@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Building2, 
   Search, 
@@ -8,15 +9,13 @@ import {
   User as UserIcon, 
   ArrowRight, 
   X, 
-  Upload, 
-  Filter, 
-  Layers, 
-  Users 
+  Upload
 } from 'lucide-react';
 import { UCC_DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../context/AuthContext';
 
 export default function Departments() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDivision, setSelectedDivision] = useState('All Divisions');
@@ -148,7 +147,10 @@ export default function Departments() {
                   +12
                 </div>
               </div>
-              <button className="text-xs font-black text-ucc-blue uppercase tracking-widest hover:underline flex items-center gap-1 group/btn">
+               <button 
+                onClick={() => navigate('/documents')}
+                className="text-xs font-black text-ucc-blue uppercase tracking-widest hover:underline flex items-center gap-1 group/btn"
+              >
                 View Archives <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </div>
