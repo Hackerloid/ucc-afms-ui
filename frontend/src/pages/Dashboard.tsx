@@ -50,7 +50,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-8 animate-fade-in p-2">
+    <div className="workspace-page">
       {/* Header / Greetings */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="animate-slide-up">
@@ -58,10 +58,10 @@ export default function Dashboard() {
             <span className="px-2 py-1 rounded bg-ucc-blue/5 text-ucc-blue text-[10px] font-black uppercase tracking-widest border border-ucc-blue/10">Academic Term 2025/2026</span>
             <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
           </div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tighter leading-none">
+          <h1 className="workspace-title">
             Welcome back, <span className="text-ucc-blue">{user?.name.split(' ')[0]}</span>
           </h1>
-          <p className="text-sm text-gray-500 mt-3 font-medium max-w-xl leading-relaxed">
+          <p className="workspace-subtitle max-w-2xl">
             {user?.role === 'Super Admin' ? 
               'System health is optimal. You have full oversight of University document flows and institutional records.' : 
               `Accessing established records for the ${user?.department}. Ensure all incoming correspondence is digitized.`}
@@ -73,7 +73,7 @@ export default function Dashboard() {
               onClick={() => navigate('/reports')}
               className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-2xl hover:bg-gray-50 transition-all shadow-sm font-bold text-xs uppercase tracking-widest hover:shadow-md"
             >
-              Audit Logs
+              Open Reports
             </button>
           )}
           {hasPermission('documents') && (
@@ -88,7 +88,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 xl:gap-6 2xl:gap-7 animate-slide-up" style={{ animationDelay: '200ms' }}>
         <StatCard 
           title="Total Repository" 
           value="1,284" 
@@ -106,7 +106,7 @@ export default function Dashboard() {
           delay="50ms"
         />
         <StatCard 
-          title="Memos Finalized" 
+          title="Letters Finalized" 
           value="156" 
           icon={<CheckCircle size={22} />} 
           colorClass="#10B981" // emerald-500
@@ -123,12 +123,12 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-5 2xl:grid-cols-6 gap-6 xl:gap-7 2xl:gap-8">
         
         {/* Recent Activity List */}
-        <div className="lg:col-span-2 xl:col-span-3 space-y-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
+        <div className="xl:col-span-4 2xl:col-span-5 space-y-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-xl font-black text-gray-900 tracking-tight">Recent Archives</h3>
+            <h3 className="section-title">Recent Activities</h3>
             <button 
               onClick={() => navigate('/documents')}
               className="text-[10px] font-black text-ucc-blue hover:underline uppercase tracking-widest flex items-center gap-1 group"
@@ -161,7 +161,7 @@ export default function Dashboard() {
                           </div>
                           <div className="min-w-0">
                             <div className="font-bold text-gray-900 truncate tracking-tight">{doc.title}</div>
-                            <div className="text-[10px] text-gray-400 mt-1 font-bold uppercase tracking-wider">{doc.id} • {doc.date}</div>
+                            <div className="text-[10px] text-gray-400 mt-1 font-bold uppercase tracking-wider">{doc.id} - {doc.date}</div>
                           </div>
                         </div>
                       </td>
@@ -193,11 +193,11 @@ export default function Dashboard() {
         </div>
 
         {/* Sidebar Info Panels */}
-        <div className="space-y-8 animate-slide-up" style={{ animationDelay: '400ms' }}>
+        <div className="space-y-8 animate-slide-up xl:col-span-1" style={{ animationDelay: '400ms' }}>
           
           {/* Quick Hub */}
           <div className="space-y-4">
-            <h3 className="text-xl font-black text-gray-900 tracking-tight px-2">Access Hub</h3>
+            <h3 className="section-title px-2">Access Hub</h3>
             <div className="grid grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4">
               <QuickActionBtn 
                 icon={<FileText size={20} />} 
@@ -232,7 +232,7 @@ export default function Dashboard() {
 
           {/* Institutional Reminders */}
           <div className="space-y-4">
-            <h3 className="text-xl font-black text-gray-900 tracking-tight px-2">Institutional Memos</h3>
+            <h3 className="section-title px-2">Institutional Letters</h3>
             <div className="glass-panel p-2">
               <ul className="space-y-1">
                 <MemoItem title="Review VC Annual Address" due="Action Required" priority="high" onClick={() => navigate('/correspondence')} />

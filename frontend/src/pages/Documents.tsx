@@ -17,7 +17,7 @@ import {
   Upload,
   Layers
 } from 'lucide-react';
-import { UCC_DEPARTMENTS } from '../constants/departments';
+import { DEPARTMENT_DIRECTORY, formatDepartmentLabel } from '../constants/departments';
 import { useAuth } from '../context/AuthContext';
 
 interface Document {
@@ -80,7 +80,7 @@ export default function Documents() {
       refNo: 'UCC/FIN/2026/112', 
       subject: 'Quarterly Budget Allocation - Q2', 
       type: 'Report', 
-      department: 'Office of the Director of Finance', 
+      department: 'Directorate of Finance', 
       sender: 'Finance Officer', 
       date: '2026-03-12', 
       priority: 'Confidential', 
@@ -92,7 +92,7 @@ export default function Documents() {
       refNo: 'UCC/IT/2026/008', 
       subject: 'Network Infrastructure Upgrade Proposal', 
       type: 'Internal Memo', 
-      department: 'Directorate of ICT Services (DICTS)', 
+      department: 'Directorate of Information & Communication Technology Services (DICTS)', 
       sender: 'Head of IT', 
       date: '2026-03-10', 
       priority: 'Immediate', 
@@ -129,7 +129,7 @@ export default function Documents() {
   const { user } = useAuth();
 
   return (
-    <div className="space-y-8 animate-fade-in p-2 pb-20">
+    <div className="workspace-page">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="animate-slide-up">
@@ -137,11 +137,11 @@ export default function Documents() {
             <span className="px-2 py-1 rounded bg-ucc-blue/5 text-ucc-blue text-[10px] font-black uppercase tracking-widest border border-ucc-blue/10">Institutional Repository</span>
             <span className="w-1.5 h-1.5 rounded-full bg-ucc-blue"></span>
           </div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tighter leading-none">
-            Documents <span className="text-ucc-blue">Explorer</span>
+          <h1 className="workspace-title">
+            Document <span className="text-ucc-blue">Registry</span>
           </h1>
-          <p className="text-sm text-gray-500 mt-3 font-medium max-w-xl leading-relaxed">
-            Access and manage the centralized repository of all institutional correspondence, internal memos, and academic reports.
+          <p className="workspace-subtitle max-w-2xl">
+            Access, register, and review university records, letters, and official reports from one central registry.
           </p>
         </div>
         
@@ -157,19 +157,19 @@ export default function Documents() {
               onClick={() => setShowRegisterModal(true)}
               className="px-6 py-2.5 bg-ucc-blue hover:bg-black text-white rounded-2xl shadow-xl shadow-ucc-blue/20 transition-all hover:-translate-y-1 font-bold text-xs uppercase tracking-widest flex items-center gap-2"
             >
-              <Plus size={16} /> Register Document
+              <Plus size={16} /> Register Record
             </button>
           </div>
         )}
       </div>
 
       {/* Stats Quick View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 xl:gap-6 2xl:gap-7 animate-slide-up" style={{ animationDelay: '200ms' }}>
         {[
-          { label: 'Total Archives', count: '1,248', icon: FileText, color: 'text-ucc-blue', bg: 'bg-ucc-blue/5', border: 'border-ucc-blue/10' },
+          { label: 'Total Records', count: '1,248', icon: FileText, color: 'text-ucc-blue', bg: 'bg-ucc-blue/5', border: 'border-ucc-blue/10' },
           { label: 'Pending Review', count: '42', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
-          { label: 'Recently Finalized', count: '156', icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-100' },
-          { label: 'Urgent Action', count: '08', icon: AlertCircle, color: 'text-ucc-red', bg: 'bg-ucc-red/5', border: 'border-ucc-red/10' },
+          { label: 'Recently Uploaded', count: '156', icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-100' },
+          { label: 'Urgent Records', count: '08', icon: AlertCircle, color: 'text-ucc-red', bg: 'bg-ucc-red/5', border: 'border-ucc-red/10' },
         ].map((stat, i) => (
           <div key={i} className={`glass-card p-5 group hover:scale-[1.02] transition-all border-t-2`} style={{ borderTopColor: stat.color.startsWith('text-ucc') ? '#003366' : (stat.color.includes('amber') ? '#F2A900' : (stat.color.includes('green') ? '#10B981' : '#C8102E')) }}>
             <div className="flex items-center gap-4">
@@ -271,9 +271,9 @@ export default function Documents() {
           </div>
 
           <div className="px-8 py-5 border-t border-gray-100 bg-gray-50/30 flex items-center justify-between">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Reflecting <span className="text-gray-900">4</span> of <span className="text-gray-900 text-ucc-blue">1,248</span> repository entries</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Showing <span className="text-gray-900">4</span> of <span className="text-gray-900 text-ucc-blue">1,248</span> repository records</p>
             <div className="flex gap-2">
-              <button disabled className="px-4 py-1.5 border border-gray-200 rounded-lg text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100/50 cursor-not-allowed">Prior Repository</button>
+              <button disabled className="px-4 py-1.5 border border-gray-200 rounded-lg text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100/50 cursor-not-allowed">Previous Page</button>
               <button className="px-4 py-1.5 border border-gray-200 rounded-lg text-[10px] font-black text-gray-700 uppercase tracking-widest hover:bg-white hover:border-ucc-blue/20 transition-all">Next Entries</button>
             </div>
           </div>
@@ -282,19 +282,20 @@ export default function Documents() {
 
       {/* Registration Modal Overlay */}
       {showRegisterModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ucc-blue/20 backdrop-blur-xl animate-fade-in">
-          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-up border border-white/50">
+        <div className="modal-overlay animate-fade-in">
+          <div className="modal-frame">
+          <div className="modal-shell max-w-4xl animate-slide-up">
             {/* Modal Header */}
-            <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-ucc-blue to-ucc-blue-dark text-white relative overflow-hidden">
+            <div className="modal-header bg-gradient-to-r from-ucc-blue to-ucc-blue-dark text-white overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-white/10 rounded-full blur-3xl"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2 py-1 rounded bg-white/20 text-white text-[9px] font-black uppercase tracking-widest backdrop-blur-md">Institutional Process</span>
+                  <span className="px-2 py-1 rounded bg-white/20 text-white text-[9px] font-black uppercase tracking-widest backdrop-blur-md">Document Registration</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-ucc-gold animate-pulse"></span>
                 </div>
-                <h2 className="text-3xl font-black tracking-tighter">Digital Record <span className="text-ucc-gold">Entry</span></h2>
-                <p className="text-[10px] text-blue-100 mt-2 font-black uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
-                  Reference No: <span className="bg-white/10 px-2 py-0.5 rounded">UCC-REG-2026-VOID</span>
+                <h2 className="modal-title">Register a <span className="text-ucc-gold">New Record</span></h2>
+                <p className="text-[11px] text-blue-100 mt-3 font-medium max-w-xl leading-relaxed">
+                  Enter the record details below and upload the source file for the registry.
                 </p>
               </div>
               <button 
@@ -306,16 +307,16 @@ export default function Documents() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+            <div className="modal-body">
               <form className="space-y-10">
                 {/* Form Group: Identity */}
                 <div className="space-y-6">
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.25em] flex items-center gap-3">
-                    <span className="w-8 h-px bg-gray-200"></span> 01. Metadata Identity
+                    <span className="w-8 h-px bg-gray-200"></span> 01. Record Details
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
                     <div className="md:col-span-2">
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Document Subject / Title</label>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Document Subject</label>
                       <input 
                         type="text" 
                         placeholder="Enter the official subject title as written on the document..."
@@ -323,7 +324,7 @@ export default function Documents() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Classification Type</label>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Document Type</label>
                       <select className="w-full bg-gray-50 border border-gray-200 rounded-[1.25rem] py-4 px-6 focus:bg-white focus:border-ucc-blue/30 transition-all outline-none text-sm font-bold appearance-none cursor-pointer">
                         <option>Internal Memo</option>
                         <option>Incoming Correspondence</option>
@@ -333,7 +334,7 @@ export default function Documents() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Priority Classification</label>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Priority Level</label>
                       <select className="w-full bg-gray-50 border border-gray-200 rounded-[1.25rem] py-4 px-6 focus:bg-white focus:border-ucc-blue/30 transition-all outline-none text-sm font-bold appearance-none cursor-pointer">
                         <option>Standard Distribution</option>
                         <option>Urgent Processing</option>
@@ -342,16 +343,16 @@ export default function Documents() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Originating University Unit</label>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Source Department / Unit</label>
                       <select className="w-full bg-gray-50 border border-gray-200 rounded-[1.25rem] py-4 px-6 focus:bg-white focus:border-ucc-blue/30 transition-all outline-none text-sm font-bold appearance-none cursor-pointer">
-                        {UCC_DEPARTMENTS.slice(0, 15).map(dept => (
-                          <option key={dept.id} value={dept.name}>{dept.name}</option>
+                        {DEPARTMENT_DIRECTORY.map(dept => (
+                          <option key={dept.id} value={dept.name}>{formatDepartmentLabel(dept)}</option>
                         ))}
                         <option>Other / External Entity</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Originating Officer / Entity</label>
+                      <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Sender / Source Officer</label>
                       <input 
                         type="text" 
                         placeholder="Name of Dean, Director, or External Entity"
@@ -364,7 +365,7 @@ export default function Documents() {
                 {/* Form Group: Assets */}
                 <div className="space-y-6">
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.25em] flex items-center gap-3">
-                    <span className="w-8 h-px bg-gray-200"></span> 02. Digital Assets
+                    <span className="w-8 h-px bg-gray-200"></span> 02. File Upload
                   </h3>
                   <div className="px-2">
                     <div className="group relative">
@@ -373,8 +374,8 @@ export default function Documents() {
                         <div className="w-20 h-20 rounded-[2rem] bg-white shadow-xl flex items-center justify-center text-ucc-blue mb-6 group-hover:scale-110 group-hover:translate-y-[-10px] transition-all duration-500">
                           <Upload size={36} strokeWidth={1.5} />
                         </div>
-                        <h4 className="text-xl font-black text-gray-900 tracking-tight">Institutional Document Scan</h4>
-                        <p className="text-sm text-gray-400 mt-2 font-medium">Capture or drag PDF, DOCX, or high-res images here</p>
+                        <h4 className="text-xl font-black text-gray-900 tracking-tight">Upload Source File</h4>
+                        <p className="text-sm text-gray-400 mt-2 font-medium">Drag in a PDF, DOCX, or image file for this record.</p>
                         <div className="mt-8 flex gap-4">
                           <span className="px-3 py-1 bg-white rounded-lg border border-gray-100 text-[9px] font-black text-gray-400 uppercase tracking-widest">Max 25MB</span>
                           <span className="px-3 py-1 bg-ucc-blue/5 rounded-lg border border-ucc-blue/10 text-[9px] font-black text-ucc-blue uppercase tracking-widest flex items-center gap-1">
@@ -389,7 +390,7 @@ export default function Documents() {
                 {/* Form Group: Taxonomy */}
                 <div className="space-y-6">
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.25em] flex items-center gap-3">
-                    <span className="w-8 h-px bg-gray-200"></span> 03. Search Taxonomy
+                    <span className="w-8 h-px bg-gray-200"></span> 03. Tags And Search
                   </h3>
                   <div className="px-2">
                     <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Archival Tags & Keywords</label>
@@ -411,28 +412,30 @@ export default function Documents() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-8 border-t border-gray-100 bg-gray-50 flex justify-end gap-4">
+            <div className="modal-footer">
               <button 
                 onClick={() => setShowRegisterModal(false)}
                 className="px-8 py-3.5 border border-gray-200 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-gray-900 hover:bg-white hover:border-gray-300 transition-all rounded-2xl"
               >
-                Cancel Entry
+                Cancel
               </button>
               <button className="px-10 py-3.5 bg-ucc-blue text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-black shadow-xl shadow-ucc-blue/20 transition-all hover:translate-y-[-2px] active:translate-y-0">
-                Finalize & Archive Record
+                Finalize and Upload Record
               </button>
             </div>
+          </div>
           </div>
         </div>
       )}
       {/* Batch Actions Modal */}
       {showBatchModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ucc-blue/20 backdrop-blur-xl animate-fade-in">
-          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl animate-slide-up border border-white/50 overflow-hidden">
-            <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div className="modal-overlay animate-fade-in">
+          <div className="modal-frame">
+          <div className="modal-shell max-w-2xl animate-slide-up">
+            <div className="modal-header bg-gray-50">
               <div>
                 <h2 className="text-2xl font-black text-gray-900 tracking-tight">Batch Operations</h2>
-                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Select multiple records to process</p>
+                <p className="text-sm text-gray-500 mt-2 font-medium">Choose what to do with the records you have selected.</p>
               </div>
               <button 
                 onClick={() => setShowBatchModal(false)}
@@ -441,8 +444,8 @@ export default function Documents() {
                 <X size={20} />
               </button>
             </div>
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="modal-body space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button className="p-6 border border-gray-100 rounded-2xl hover:border-ucc-blue/30 hover:bg-ucc-blue/5 transition-all flex flex-col items-center gap-3">
                   <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                     <Download size={24} />
@@ -470,14 +473,15 @@ export default function Documents() {
               </div>
               <p className="text-center text-[10px] text-gray-400 font-medium">Please select documents from the repository grid first to enable batch processing.</p>
             </div>
-            <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
+            <div className="modal-footer">
               <button 
                 onClick={() => setShowBatchModal(false)}
                 className="px-6 py-2.5 bg-ucc-blue text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all"
               >
-                Close Toolbar
+                Close
               </button>
             </div>
+          </div>
           </div>
         </div>
       )}

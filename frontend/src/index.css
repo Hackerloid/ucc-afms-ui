@@ -1,10 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --app-shell-max: 1880px;
+    --sidebar-shell-width: clamp(17rem, 15.5rem + 2vw, 19.25rem);
+    --ui-text-muted-400: #667085;
+    --ui-text-muted-500: #475467;
+    --ui-text-muted-600: #344054;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
     @apply bg-[#f8f9fa] text-gray-800 m-0 p-0 font-sans antialiased;
+    font-feature-settings: "ss01" 1, "cv01" 1, "cv11" 1;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
     background-image: 
       radial-gradient(at 0% 0%, rgba(0, 51, 102, 0.03) 0, transparent 50%), 
       radial-gradient(at 100% 0%, rgba(255, 204, 0, 0.03) 0, transparent 50%),
@@ -12,11 +29,78 @@
     background-attachment: fixed;
     background-blend-mode: soft-light;
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Sora", "Manrope", "Segoe UI", sans-serif;
+    letter-spacing: -0.045em;
+  }
+
+  button,
+  input,
+  textarea,
+  select,
+  kbd {
+    font: inherit;
+  }
 }
 
 @layer components {
+  .workspace-page {
+    @apply space-y-6 xl:space-y-8 2xl:space-y-10 animate-fade-in p-1 sm:p-2 xl:p-3 pb-16 xl:pb-20;
+  }
+
+  .workspace-title {
+    @apply font-display text-[clamp(2rem,1.55rem+1.05vw,3.3rem)] font-black tracking-[-0.06em] leading-[0.95] text-gray-900;
+  }
+
+  .workspace-subtitle {
+    @apply text-sm xl:text-[15px] 2xl:text-base text-gray-500 mt-3 font-medium leading-relaxed;
+  }
+
+  .section-title {
+    @apply font-display text-lg xl:text-xl 2xl:text-[1.4rem] font-black tracking-[-0.04em] text-gray-900;
+  }
+
+  .modal-overlay {
+    @apply fixed inset-0 z-[120] bg-[#001226]/45 backdrop-blur-md p-3 sm:p-4 md:p-6 overflow-y-auto;
+  }
+
+  .modal-frame {
+    @apply min-h-full flex items-start sm:items-center justify-center;
+  }
+
+  .modal-shell {
+    @apply relative w-full bg-white rounded-[1.75rem] shadow-2xl border border-white/50 overflow-hidden flex flex-col;
+    max-height: calc(100vh - 1.5rem);
+  }
+
+  .modal-header {
+    @apply p-5 sm:p-6 xl:p-8 border-b border-gray-100 flex justify-between items-start gap-4 relative;
+  }
+
+  .modal-body {
+    @apply p-5 sm:p-6 xl:p-8 overflow-y-auto flex-1 custom-scrollbar;
+  }
+
+  .modal-footer {
+    @apply p-5 sm:p-6 xl:p-8 border-t border-gray-100 bg-gray-50 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4;
+  }
+
+  .modal-title {
+    @apply font-display text-2xl sm:text-[1.9rem] xl:text-[2.15rem] font-black tracking-[-0.05em];
+  }
+
+  .modal-subtitle {
+    @apply text-xs sm:text-[11px] text-gray-400 mt-2 font-black uppercase tracking-[0.18em];
+  }
+
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-xl rounded-2xl shadow-premium border border-white/40;
+    @apply bg-white/80 backdrop-blur-xl rounded-[1.75rem] shadow-premium border border-white/40;
     position: relative;
     overflow: hidden;
   }
@@ -27,7 +111,7 @@
   }
   
   .glass-card {
-    @apply bg-white/60 backdrop-blur-lg border border-white/60 shadow-sm rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)];
+    @apply bg-white/60 backdrop-blur-lg border border-white/60 shadow-sm rounded-[1.6rem] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)];
   }
   
   .glass-card:hover {
@@ -36,12 +120,13 @@
 
   /* Premium Sidebar Refinement */
   .sidebar-modern {
-    @apply fixed hidden lg:flex lg:w-64 xl:w-72 h-screen bg-[#001f3f] text-white overflow-hidden flex-col z-50 border-r border-white/5 shadow-2xl;
+    @apply fixed inset-y-0 left-0 flex h-screen bg-[#001f3f] text-white overflow-hidden flex-col z-[70] lg:z-50 border-r border-white/5 shadow-2xl transition-transform duration-300 ease-out;
+    width: var(--sidebar-shell-width);
     background: linear-gradient(180deg, #001f3f 0%, #001226 100%);
   }
 
   .sidebar-brand {
-    @apply py-10 px-8 flex flex-col items-center justify-center relative;
+    @apply py-8 px-6 xl:py-10 xl:px-8 flex flex-col items-center justify-center relative;
   }
 
   .sidebar-brand::after {
@@ -50,11 +135,11 @@
   }
 
   .sidebar-menu {
-    @apply list-none p-6 m-0 flex-1 space-y-3 overflow-y-auto custom-scrollbar;
+    @apply list-none p-4 xl:p-6 m-0 flex-1 space-y-2 xl:space-y-3 overflow-y-auto custom-scrollbar;
   }
 
   .sidebar-menu li a {
-    @apply flex items-center gap-4 py-3.5 px-5 text-white/60 rounded-2xl transition-all duration-300 no-underline font-semibold tracking-tight;
+    @apply flex items-center gap-4 py-3 xl:py-3.5 px-4 xl:px-5 text-[0.95rem] text-white/60 rounded-2xl transition-all duration-300 no-underline font-semibold tracking-tight;
   }
 
   .sidebar-menu li a:hover {
@@ -85,6 +170,48 @@
   }
 }
 
+@layer utilities {
+  .text-gray-400 {
+    color: var(--ui-text-muted-400);
+  }
+
+  .text-gray-500 {
+    color: var(--ui-text-muted-500);
+  }
+
+  .text-gray-600 {
+    color: var(--ui-text-muted-600);
+  }
+}
+
 .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
 .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-slide-in-right { animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slide-left { animation: slideInLeft 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@media (min-width: 640px) {
+  .modal-shell {
+    max-height: calc(100vh - 2rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout-sidebar-open .modal-overlay {
+    left: var(--sidebar-shell-width);
+  }
+
+  .modal-shell {
+    max-height: calc(100vh - 3rem);
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

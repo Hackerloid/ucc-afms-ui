@@ -5,7 +5,19 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    screens: {
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+      '3xl': '1800px',
+    },
     extend: {
+      fontFamily: {
+        sans: ['"Manrope"', '"Segoe UI"', 'sans-serif'],
+        display: ['"Sora"', '"Manrope"', '"Segoe UI"', 'sans-serif'],
+      },
       colors: {
         ucc: {
           blue: {

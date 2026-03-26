@@ -36,10 +36,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = (email: string, password: string): boolean => {
     // Hardcoded test users
     const testUsers: Record<string, { password: string, name: string, role: UserRole, department: string }> = {
-      'admin@ucc.edu.gh': { password: 'uccAdmin2026', name: 'Dr. Regina Gyampoh-Vidogah', role: 'Super Admin', department: 'Directorate of ICT Services (DICTS)' },
-      'head@ucc.edu.gh': { password: 'uccHead2026', name: 'Prof. David Teye Doku', role: 'Department Head', department: 'Directorate of Research, Innovation and Consultancy (DRIC)' },
-      'clerk@ucc.edu.gh': { password: 'uccClerk2026', name: 'Akwasi Appiah', role: 'Records Clerk', department: 'Records Office' },
-      'viewer@ucc.edu.gh': { password: 'uccView2026', name: 'Kofi Annan', role: 'Viewer', department: 'General Administration Division' },
+      'admin@ucc.edu.gh': { password: 'uccAdmin2026', name: 'Dr. Regina Gyampoh-Vidogah', role: 'Super Admin', department: 'Directorate of Information & Communication Technology Services (DICTS)' },
+      'head@ucc.edu.gh': { password: 'uccHead2026', name: 'Prof. David Teye Doku', role: 'Department Head', department: 'Directorate of Research, Innovation & Consultancy (DRIC)' },
+      'clerk@ucc.edu.gh': { password: 'uccClerk2026', name: 'Akwasi Appiah', role: 'Records Clerk', department: "Registrar's Office" },
+      'viewer@ucc.edu.gh': { password: 'uccView2026', name: 'Kofi Annan', role: 'Viewer', department: 'Finance Office' },
     };
 
     const foundUser = testUsers[email];

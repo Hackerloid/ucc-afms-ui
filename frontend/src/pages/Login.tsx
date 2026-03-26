@@ -40,8 +40,8 @@ export default function Login() {
           <img src="/ucc-logo.png" alt="UCC Logo" className="w-20 h-20 object-contain group-hover:scale-110 transition-transform duration-500" />
         </div>
         <div className="text-center">
-          <h1 className="text-3xl font-black text-[#001f3f] tracking-tighter animate-slide-up" style={{ animationDelay: '100ms' }}>UNIVERSITY <span className="text-ucc-blue">DMS</span></h1>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] animate-slide-up" style={{ animationDelay: '150ms' }}>Document Management System</p>
+          <h1 className="text-3xl font-black text-[#001f3f] tracking-tighter animate-slide-up" style={{ animationDelay: '100ms' }}>UCC <span className="text-ucc-blue">UDMS</span></h1>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] animate-slide-up" style={{ animationDelay: '150ms' }}>University Document Management System</p>
         </div>
       </div>
 
@@ -86,7 +86,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-gray-50/50 border border-gray-200 text-gray-900 rounded-xl focus:ring-2 focus:ring-ucc-blue focus:border-ucc-blue block pl-10 pr-10 p-3 transition-colors"
-                placeholder="••••••••"
+                placeholder="Enter your password"
               />
               <button 
                 type="button"

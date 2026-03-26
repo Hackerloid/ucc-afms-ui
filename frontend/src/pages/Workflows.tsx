@@ -65,12 +65,12 @@ export default function Workflows() {
   ];
 
   return (
-    <div className="space-y-6 animate-fade pb-10">
+    <div className="workspace-page">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Workflow Automation</h1>
-          <p className="text-sm text-gray-500 mt-1">Track and manage multi-step document approval processes (FR-400 Series).</p>
+          <h1 className="font-display text-[clamp(1.85rem,1.55rem+0.7vw,2.65rem)] font-black text-gray-900 tracking-[-0.05em]">Workflow Automation</h1>
+          <p className="text-sm xl:text-[15px] text-gray-500 mt-2 font-medium leading-relaxed max-w-2xl">Track and manage multi-step document approval processes (FR-400 Series).</p>
         </div>
         <div className="flex gap-2 text-sm">
           <div className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-bold flex items-center border border-amber-200">
@@ -79,10 +79,10 @@ export default function Workflows() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[360px,minmax(0,1fr)] 2xl:grid-cols-[400px,minmax(0,1fr)] gap-6 xl:gap-8">
         
         {/* Active Workflows List */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className="space-y-4">
           <div className="flex justify-between items-center px-1">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Active Routings</h3>
             <button className="text-gray-400 hover:text-gray-900"><Filter size={16} /></button>
@@ -133,7 +133,7 @@ export default function Workflows() {
         </div>
 
         {/* Workflow Detail View */}
-        <div className="lg:col-span-2">
+        <div className="min-w-0">
           {selectedWorkflow ? (
             <div className="glass-card flex flex-col h-full min-h-[600px] animate-slide-left">
               <div className="p-6 border-b border-gray-100 flex justify-between items-start bg-white/50">
