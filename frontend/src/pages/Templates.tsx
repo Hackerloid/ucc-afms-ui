@@ -22,7 +22,7 @@ interface Template {
 }
 
 export default function Templates() {
-  const [_selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [, setSelectedTemplate] = useState<Template | null>(null);
 
   const templatesData: Template[] = [
     {

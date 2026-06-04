@@ -8,6 +8,7 @@ import {
   FileCheck,
   LogOut,
   GitBranch,
+  Settings,
   X
 } from 'lucide-react';
 
@@ -28,6 +29,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <aside
+      id="primary-sidebar"
       className={`sidebar-modern ${isOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'}`}
       aria-hidden={!isOpen}
     >
@@ -104,6 +106,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <li>
               <NavLink to="/reports" onClick={handleNavItemClick} className={({ isActive }) => isActive ? "active group" : "group"}>
                 <FileCheck size={20} /> <span>Reports</span>
+              </NavLink>
+            </li>
+          )}
+          {hasPermission('settings') && (
+            <li>
+              <NavLink to="/settings" onClick={handleNavItemClick} className={({ isActive }) => isActive ? "active group" : "group"}>
+                <Settings size={20} /> <span>Settings</span>
               </NavLink>
             </li>
           )}

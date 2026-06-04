@@ -9,6 +9,7 @@ import {
   Settings,
   Plus
 } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -252,7 +253,15 @@ export default function Dashboard() {
 }
 
 // Sub-components for cleaner Dashboard
-const QuickActionBtn = ({ icon, label, color, hasPermission, onClick }: any) => {
+interface QuickActionBtnProps {
+  icon: ReactNode;
+  label: string;
+  color: string;
+  hasPermission: boolean;
+  onClick: () => void;
+}
+
+const QuickActionBtn = ({ icon, label, color, hasPermission, onClick }: QuickActionBtnProps) => {
   if (!hasPermission) return null;
   return (
     <button 

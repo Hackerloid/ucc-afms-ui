@@ -120,7 +120,7 @@
 
   /* Premium Sidebar Refinement */
   .sidebar-modern {
-    @apply fixed inset-y-0 left-0 flex h-screen bg-[#001f3f] text-white overflow-hidden flex-col z-[70] lg:z-50 border-r border-white/5 shadow-2xl transition-transform duration-300 ease-out;
+    @apply fixed inset-y-0 left-0 flex h-screen bg-[#001f3f] text-white overflow-hidden flex-col z-[100] lg:z-50 border-r border-white/5 shadow-2xl transition-transform duration-300 ease-out;
     width: var(--sidebar-shell-width);
     background: linear-gradient(180deg, #001f3f 0%, #001226 100%);
   }

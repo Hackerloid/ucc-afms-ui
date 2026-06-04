@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useContext, useState } from 'react';
 
 export type UserRole = 'Super Admin' | 'Department Head' | 'Records Clerk' | 'Viewer';
 
@@ -20,18 +21,23 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+const getSavedUser = (): User | null => {
+  if (typeof window === 'undefined') return null;
 
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem('dms_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
-  }, []);
+  const savedUser = localStorage.getItem('dms_user');
+  if (!savedUser) return null;
+
+  try {
+    return JSON.parse(savedUser) as User;
+  } catch {
+    localStorage.removeItem('dms_user');
+    return null;
+  }
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(() => getSavedUser());
+  const loading = false;
 
   const login = (email: string, password: string): boolean => {
     // Hardcoded test users

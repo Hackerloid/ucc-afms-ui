@@ -35,13 +35,12 @@ interface Document {
 
 export default function Documents() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(() => searchParams.get('new') === 'true');
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (searchParams.get('new') === 'true') {
-      setShowRegisterModal(true);
       // Clear the param after opening to avoid re-opening on refresh if not intended, 
       // but usually keeping it is fine. Let's clear it for a better UX.
       const newParams = new URLSearchParams(searchParams);
